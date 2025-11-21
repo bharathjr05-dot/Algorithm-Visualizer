@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Operations - Algorithm Visualizer</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/datastructures.css">
+</head>
+<body>
+    <header>
+        <h1>Array Operations Visualizer</h1>
+        <div style="position: absolute; top: 2rem; left: 2rem;">
+            <a href="/datastructures" class="back-btn">← Back to Data Structures</a>
+        </div>
+    </header>
+    
+    <main>
+        <div class="controls">
+            <div class="input-section">
+                <label>Current Array:</label>
+                <input type="text" id="arrayInput" placeholder="10,20,30,40,50" value="10,20,30,40,50">
+                <button onclick="updateArray()">Update Array</button>
+            </div>
+            
+            <div class="operation-buttons">
+                <div class="operation-group">
+                    <h4>Insert Operation</h4>
+                    <input type="number" id="insertElement" placeholder="Element" value="25">
+                    <input type="number" id="insertPosition" placeholder="Position" value="2">
+                    <button onclick="performInsert()">Insert</button>
+                </div>
+                
+                <div class="operation-group">
+                    <h4>Delete Operation</h4>
+                    <input type="number" id="deletePosition" placeholder="Position" value="1">
+                    <button onclick="performDelete()">Delete</button>
+                </div>
+                
+                <div class="operation-group">
+                    <h4>Search Operation</h4>
+                    <input type="number" id="searchElement" placeholder="Element" value="30">
+                    <button onclick="performSearch()">Search</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="visualization-area">
+            <div class="playback-controls">
+                <button id="prevBtn" onclick="previousStep()" disabled>Previous</button>
+                <button id="playBtn" onclick="togglePlay()" disabled>Play</button>
+                <button id="nextBtn" onclick="nextStep()" disabled>Next</button>
+                <span id="stepInfo">Step: 0 / 0</span>
+            </div>
+            
+            <div id="arrayContainer"></div>
+            <div id="stepDescription">Array ready. Select an operation to start visualization</div>
+        </div>
+    </main>
+    
+    <script src="/js/array.js"></script>
+</body>
+</html>

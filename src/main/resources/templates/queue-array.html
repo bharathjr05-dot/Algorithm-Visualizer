@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue using Array - Algorithm Visualizer</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/datastructures.css}">
+    <style>
+        .queue-array-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
+        .queue-array {
+            display: flex;
+            gap: 3px;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            border: 2px dashed rgba(102, 126, 234, 0.3);
+        }
+        .queue-cell {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .queue-cell.filled {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: rgba(255,255,255,0.3);
+        }
+        .queue-cell.front {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+        }
+        .queue-cell.rear {
+            background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+            box-shadow: 0 4px 15px rgba(225, 112, 85, 0.4);
+        }
+        .queue-indices {
+            display: flex;
+            gap: 3px;
+        }
+        .queue-index {
+            width: 60px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+        .queue-pointers {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+        }
+        .pointer {
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        .message-success { background: linear-gradient(135deg, #00b894 0%, #00a085 100%); }
+        .message-error { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); }
+        .message-info { background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Queue using Array (Fixed Size)</h1>
+        <a href="/datastructures" class="back-btn">← Back to Data Structures</a>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="number" id="queueValue" placeholder="Enter value (1-100)" min="1" max="100">
+                <button onclick="enqueue()" class="btn-primary">➡️ Enqueue</button>
+            </div>
+            <div class="button-group">
+                <button onclick="dequeue()" class="btn-danger">⬅️ Dequeue</button>
+                <button onclick="frontElement()" class="btn-info">👁️ Front</button>
+                <button onclick="rearElement()" class="btn-info">👁️ Rear</button>
+                <button onclick="clearQueue()" class="btn-warning">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <div class="visualization-area">
+            <div class="queue-array-container">
+                <div class="queue-pointers">
+                    <div class="pointer">FRONT → <span id="frontPointer">0</span></div>
+                    <div class="pointer">REAR → <span id="rearPointer">2</span></div>
+                </div>
+                <div id="queueArray" class="queue-array"></div>
+                <div class="queue-indices" id="queueIndices"></div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>📊 Queue Array Information</h3>
+            <div>
+                <div class="info-item">
+                    <span class="info-label">📏 Size:</span>
+                    <span id="queueSize" class="info-value">3</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📦 Capacity:</span>
+                    <span class="info-value">5</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">👆 Front Index:</span>
+                    <span id="frontIndex" class="info-value">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">👇 Rear Index:</span>
+                    <span id="rearIndex" class="info-value">2</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var queue = [10, 20, 30, null, null];
+        var front = 0;
+        var rear = 2;
+        var capacity = 5;
+        var size = 3;
+
+        function updateDisplay() {
+            var arrayElement = document.getElementById('queueArray');
+            var indicesElement = document.getElementById('queueIndices');
+            
+            arrayElement.innerHTML = '';
+            indicesElement.innerHTML = '';
+            
+            for (var i = 0; i < capacity; i++) {
+                var cell = document.createElement('div');
+                cell.className = 'queue-cell';
+                cell.textContent = queue[i] !== null ? queue[i] : '';
+                
+                if (queue[i] !== null) {
+                    cell.classList.add('filled');
+                }
+                if (i === front && size > 0) {
+                    cell.classList.add('front');
+                }
+                if (i === rear && size > 0) {
+                    cell.classList.add('rear');
+                }
+                
+                arrayElement.appendChild(cell);
+                
+                var index = document.createElement('div');
+                index.className = 'queue-index';
+                index.textContent = i;
+                indicesElement.appendChild(index);
+            }
+
+            document.getElementById('queueSize').textContent = size;
+            document.getElementById('frontIndex').textContent = size > 0 ? front : -1;
+            document.getElementById('rearIndex').textContent = size > 0 ? rear : -1;
+            document.getElementById('frontPointer').textContent = size > 0 ? front : -1;
+            document.getElementById('rearPointer').textContent = size > 0 ? rear : -1;
+        }
+
+        function showMessage(message, type) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-' + type;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            setTimeout(function() {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 3000);
+        }
+
+        function enqueue() {
+            var input = document.getElementById('queueValue');
+            var value = input.value;
+            
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+            
+            if (size >= capacity) {
+                showMessage('Queue Overflow! Array is full', 'error');
+                return;
+            }
+            
+            var num = parseInt(value);
+            if (size === 0) {
+                front = 0;
+                rear = 0;
+            } else {
+                rear = (rear + 1) % capacity;
+            }
+            
+            queue[rear] = num;
+            size++;
+            input.value = '';
+            updateDisplay();
+            showMessage('Enqueued ' + num + ' at index ' + rear, 'success');
+        }
+
+        function dequeue() {
+            if (size === 0) {
+                showMessage('Queue Underflow! Array is empty', 'error');
+                return;
+            }
+            
+            var dequeuedValue = queue[front];
+            queue[front] = null;
+            
+            if (size === 1) {
+                front = -1;
+                rear = -1;
+            } else {
+                front = (front + 1) % capacity;
+            }
+            
+            size--;
+            updateDisplay();
+            showMessage('Dequeued value: ' + dequeuedValue, 'success');
+        }
+
+        function frontElement() {
+            if (size === 0) {
+                showMessage('Queue is empty! No front element', 'error');
+                return;
+            }
+            
+            showMessage('Front element: ' + queue[front] + ' at index ' + front, 'info');
+        }
+
+        function rearElement() {
+            if (size === 0) {
+                showMessage('Queue is empty! No rear element', 'error');
+                return;
+            }
+            
+            showMessage('Rear element: ' + queue[rear] + ' at index ' + rear, 'info');
+        }
+
+        function clearQueue() {
+            if (size === 0) {
+                showMessage('Queue is already empty', 'info');
+                return;
+            }
+            
+            for (var i = 0; i < capacity; i++) {
+                queue[i] = null;
+            }
+            front = -1;
+            rear = -1;
+            size = 0;
+            updateDisplay();
+            showMessage('Queue cleared successfully', 'success');
+        }
+
+        document.getElementById('queueValue').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                enqueue();
+            }
+        });
+
+        updateDisplay();
+        setTimeout(function() {
+            showMessage('Queue initialized with default values: 10, 20, 30', 'info');
+        }, 500);
+    </script>
+</body>
+</html>

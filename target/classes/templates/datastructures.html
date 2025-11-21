@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Structures - Algorithm Visualizer</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/datastructures.css">
+</head>
+<body>
+    <header>
+        <h1>Data Structures Visualizer</h1>
+        <div style="position: absolute; top: 2rem; left: 2rem;">
+            <a href="/" class="back-btn">← Back to Home</a>
+        </div>
+    </header>
+    
+    <main>
+        <div class="ds-categories">
+            <div class="ds-category-card" onclick="window.location.href='/array'">
+                <h3>📊 Array</h3>
+                <p>Insert, Delete, Search, Update</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="window.location.href='/linkedlist'">
+                <h3>🔗 Linked List</h3>
+                <p>Insert Head/Tail/Middle, Delete, Search</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="window.location.href='/stack'">
+                <h3>📚 Stack (LIFO)</h3>
+                <p>Push, Pop, Peek, IsEmpty</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="window.location.href='/stack-array'">
+                <h3>📚 Stack using Array</h3>
+                <p>Array-based Stack Implementation</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="window.location.href='/stack-linkedlist'">
+                <h3>📚 Stack using Linked List</h3>
+                <p>Linked List-based Stack</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="window.location.href='/queue-array'">
+                <h3>🚶 Queue using Array</h3>
+                <p>Array-based Queue Implementation</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="window.location.href='/queue-linkedlist'">
+                <h3>🚶 Queue using Linked List</h3>
+                <p>Linked List-based Queue</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="alert('Coming Soon!')">
+                <h3>🌳 Binary Tree</h3>
+                <p>Insert, Delete, Traversals (In/Pre/Post)</p>
+            </div>
+            
+            <div class="ds-category-card" onclick="alert('Coming Soon!')">
+                <h3>🕸️ Graph</h3>
+                <p>Add Vertex/Edge, BFS, DFS</p>
+            </div>
+        </div>
+        
+        <!-- Array Section -->
+        <div id="array-section" class="ds-section active">
+            <h2>Array Operations</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Current Array:</label>
+                    <input type="text" id="arrayInput" placeholder="10,20,30,40,50" value="10,20,30,40,50">
+                    <button onclick="updateArray()">Update Array</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Insert Operation</h4>
+                        <input type="number" id="insertElement" placeholder="Element" value="25">
+                        <input type="number" id="insertPosition" placeholder="Position" value="2">
+                        <button onclick="performOperation('array', 'insert')">Insert</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Delete Operation</h4>
+                        <input type="number" id="deletePosition" placeholder="Position" value="1">
+                        <button onclick="performOperation('array', 'delete')">Delete</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Search Operation</h4>
+                        <input type="number" id="searchElement" placeholder="Element" value="30">
+                        <button onclick="performOperation('array', 'search')">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Linked List Section -->
+        <div id="linkedlist-section" class="ds-section">
+            <h2>Linked List Operations</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Current List:</label>
+                    <input type="text" id="linkedlistInput" placeholder="10,20,30,40" value="10,20,30,40">
+                    <button onclick="updateLinkedList()">Update List</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Insert at Head</h4>
+                        <input type="number" id="insertHeadElement" placeholder="Element" value="5">
+                        <button onclick="performOperation('linkedlist', 'insert-head')">Insert Head</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Insert at Tail</h4>
+                        <input type="number" id="insertTailElement" placeholder="Element" value="50">
+                        <button onclick="performOperation('linkedlist', 'insert-tail')">Insert Tail</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Delete Head</h4>
+                        <button onclick="performOperation('linkedlist', 'delete-head')">Delete Head</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Search Element</h4>
+                        <input type="number" id="searchLinkedListElement" placeholder="Element" value="20">
+                        <button onclick="performOperation('linkedlist', 'search')">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stack Section -->
+        <div id="stack-section" class="ds-section">
+            <h2>Stack Operations (LIFO - Last In First Out)</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Current Stack:</label>
+                    <input type="text" id="stackInput" placeholder="10,20,30" value="10,20,30">
+                    <button onclick="updateStack()">Update Stack</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Push Operation</h4>
+                        <input type="number" id="pushElement" placeholder="Element" value="40">
+                        <button onclick="performOperation('stack', 'push')">Push</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Pop Operation</h4>
+                        <button onclick="performOperation('stack', 'pop')">Pop</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Peek Operation</h4>
+                        <button onclick="performOperation('stack', 'peek')">Peek</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stack using Array Section -->
+        <div id="stack-array-section" class="ds-section">
+            <h2>Stack using Array (Fixed Size)</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Array Size:</label>
+                    <input type="number" id="stackArraySize" placeholder="Size" value="5" min="3" max="10">
+                    <button onclick="initializeStackArray()">Initialize</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Push Operation</h4>
+                        <input type="number" id="pushArrayElement" placeholder="Element" value="10">
+                        <button onclick="performOperation('stack-array', 'push')">Push</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Pop Operation</h4>
+                        <button onclick="performOperation('stack-array', 'pop')">Pop</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Peek Operation</h4>
+                        <button onclick="performOperation('stack-array', 'peek')">Peek</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stack using Linked List Section -->
+        <div id="stack-linkedlist-section" class="ds-section">
+            <h2>Stack using Linked List (Dynamic Size)</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Current Stack:</label>
+                    <input type="text" id="stackLinkedListInput" placeholder="10,20,30" value="10,20,30">
+                    <button onclick="updateStackLinkedList()">Update Stack</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Push Operation</h4>
+                        <input type="number" id="pushLinkedListElement" placeholder="Element" value="40">
+                        <button onclick="performOperation('stack-linkedlist', 'push')">Push</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Pop Operation</h4>
+                        <button onclick="performOperation('stack-linkedlist', 'pop')">Pop</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Peek Operation</h4>
+                        <button onclick="performOperation('stack-linkedlist', 'peek')">Peek</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Queue Section -->
+        <div id="queue-section" class="ds-section">
+            <h2>Queue Operations (FIFO - First In First Out)</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Current Queue:</label>
+                    <input type="text" id="queueInput" placeholder="10,20,30" value="10,20,30">
+                    <button onclick="updateQueue()">Update Queue</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Enqueue Operation</h4>
+                        <input type="number" id="enqueueElement" placeholder="Element" value="40">
+                        <button onclick="performOperation('queue', 'enqueue')">Enqueue</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Dequeue Operation</h4>
+                        <button onclick="performOperation('queue', 'dequeue')">Dequeue</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Front Element</h4>
+                        <button onclick="performOperation('queue', 'front')">Front</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Rear Element</h4>
+                        <button onclick="performOperation('queue', 'rear')">Rear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Queue using Array Section -->
+        <div id="queue-array-section" class="ds-section">
+            <h2>Queue using Array (Circular Queue)</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Array Size:</label>
+                    <input type="number" id="queueArraySize" placeholder="Size" value="5" min="3" max="10">
+                    <button onclick="initializeQueueArray()">Initialize</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Enqueue Operation</h4>
+                        <input type="number" id="enqueueArrayElement" placeholder="Element" value="10">
+                        <button onclick="performOperation('queue-array', 'enqueue')">Enqueue</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Dequeue Operation</h4>
+                        <button onclick="performOperation('queue-array', 'dequeue')">Dequeue</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Front Element</h4>
+                        <button onclick="performOperation('queue-array', 'front')">Front</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Queue using Linked List Section -->
+        <div id="queue-linkedlist-section" class="ds-section">
+            <h2>Queue using Linked List (Dynamic Size)</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Current Queue:</label>
+                    <input type="text" id="queueLinkedListInput" placeholder="10,20,30" value="10,20,30">
+                    <button onclick="updateQueueLinkedList()">Update Queue</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Enqueue Operation</h4>
+                        <input type="number" id="enqueueLinkedListElement" placeholder="Element" value="40">
+                        <button onclick="performOperation('queue-linkedlist', 'enqueue')">Enqueue</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Dequeue Operation</h4>
+                        <button onclick="performOperation('queue-linkedlist', 'dequeue')">Dequeue</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Front Element</h4>
+                        <button onclick="performOperation('queue-linkedlist', 'front')">Front</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Binary Tree Section -->
+        <div id="tree-section" class="ds-section">
+            <h2>Binary Tree Operations</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Current Tree:</label>
+                    <input type="text" id="treeInput" placeholder="50,30,70,20,40,60,80" value="50,30,70,20,40,60,80">
+                    <button onclick="updateTree()">Build Tree</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Insert Node</h4>
+                        <input type="number" id="insertTreeElement" placeholder="Element" value="25">
+                        <button onclick="performOperation('tree', 'insert')">Insert</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Delete Node</h4>
+                        <input type="number" id="deleteTreeElement" placeholder="Element" value="30">
+                        <button onclick="performOperation('tree', 'delete')">Delete</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Search Node</h4>
+                        <input type="number" id="searchTreeElement" placeholder="Element" value="40">
+                        <button onclick="performOperation('tree', 'search')">Search</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Traversals</h4>
+                        <button onclick="performOperation('tree', 'inorder')">Inorder</button>
+                        <button onclick="performOperation('tree', 'preorder')">Preorder</button>
+                        <button onclick="performOperation('tree', 'postorder')">Postorder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Graph Section -->
+        <div id="graph-section" class="ds-section">
+            <h2>Graph Operations</h2>
+            <div class="controls">
+                <div class="input-section">
+                    <label>Graph Type:</label>
+                    <select id="graphType">
+                        <option value="undirected">Undirected</option>
+                        <option value="directed">Directed</option>
+                    </select>
+                    <button onclick="initializeGraph()">Initialize Graph</button>
+                </div>
+                
+                <div class="operation-buttons">
+                    <div class="operation-group">
+                        <h4>Add Vertex</h4>
+                        <input type="text" id="addVertex" placeholder="Vertex" value="A">
+                        <button onclick="performOperation('graph', 'add-vertex')">Add Vertex</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Add Edge</h4>
+                        <input type="text" id="edgeFrom" placeholder="From" value="A">
+                        <input type="text" id="edgeTo" placeholder="To" value="B">
+                        <button onclick="performOperation('graph', 'add-edge')">Add Edge</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Breadth First Search</h4>
+                        <input type="text" id="bfsStart" placeholder="Start" value="A">
+                        <button onclick="performOperation('graph', 'bfs')">BFS</button>
+                    </div>
+                    
+                    <div class="operation-group">
+                        <h4>Depth First Search</h4>
+                        <input type="text" id="dfsStart" placeholder="Start" value="A">
+                        <button onclick="performOperation('graph', 'dfs')">DFS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Visualization Area -->
+        <div class="visualization-area">
+            <div class="playback-controls">
+                <button id="prevBtn" onclick="previousStep()" disabled>Previous</button>
+                <button id="playBtn" onclick="togglePlay()" disabled>Play</button>
+                <button id="nextBtn" onclick="nextStep()" disabled>Next</button>
+                <span id="stepInfo">Step: 0 / 0</span>
+            </div>
+            
+            <div id="dsContainer"></div>
+            <div id="stepDescription">Select a data structure and operation to start visualization</div>
+        </div>
+    </main>
+    
+    <script src="/js/datastructures.js"></script>
+</body>
+</html>

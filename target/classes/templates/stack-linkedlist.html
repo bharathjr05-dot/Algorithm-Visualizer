@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack using Linked List - Algorithm Visualizer</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/datastructures.css}">
+    <style>
+        .linkedlist-stack-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            min-width: 300px;
+        }
+        .stack-node-vertical {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            min-width: 80px;
+            text-align: center;
+            position: relative;
+        }
+        .stack-node-vertical.top-node {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+            transform: scale(1.05);
+        }
+        .node-pointer-vertical {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 5px;
+        }
+        .top-pointer {
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+        }
+        .null-pointer {
+            background: #95a5a6;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(149, 165, 166, 0.3);
+        }
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        .message-success { background: linear-gradient(135deg, #00b894 0%, #00a085 100%); }
+        .message-error { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); }
+        .message-info { background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stack using Linked List (Dynamic Size)</h1>
+        <a href="/datastructures" class="back-btn">← Back to Data Structures</a>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="number" id="stackValue" placeholder="Enter value (1-100)" min="1" max="100">
+                <button onclick="push()" class="btn-primary">🔼 Push</button>
+            </div>
+            <div class="button-group">
+                <button onclick="pop()" class="btn-danger">🔽 Pop</button>
+                <button onclick="peek()" class="btn-info">👁️ Peek</button>
+                <button onclick="clearStack()" class="btn-warning">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <div class="visualization-area">
+            <div class="linkedlist-stack-vertical" id="linkedListStack">
+                <div class="top-pointer">TOP</div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>📊 Linked List Stack Information</h3>
+            <div>
+                <div class="info-item">
+                    <span class="info-label">📏 Size:</span>
+                    <span id="stackSize" class="info-value">3</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">🔝 Top Value:</span>
+                    <span id="topValue" class="info-value">30</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">💾 Memory:</span>
+                    <span id="memoryUsage" class="info-value">3 nodes</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var stack = [10, 20, 30];
+        var size = 3;
+
+        function updateDisplay() {
+            var container = document.getElementById('linkedListStack');
+            var html = '<div class="top-pointer">TOP</div>';
+            
+            for (var i = stack.length - 1; i >= 0; i--) {
+                var className = 'stack-node-vertical';
+                if (i === stack.length - 1) className += ' top-node';
+                
+                html += '<div class="' + className + '">';
+                html += stack[i];
+                if (i > 0) {
+                    html += '<div class="node-pointer-vertical">↓</div>';
+                }
+                html += '</div>';
+            }
+            
+            if (stack.length > 0) {
+                html += '<div class="null-pointer">NULL</div>';
+            }
+            
+            container.innerHTML = html;
+            document.getElementById('stackSize').textContent = stack.length;
+            document.getElementById('topValue').textContent = stack.length > 0 ? stack[stack.length - 1] : 'None';
+            document.getElementById('memoryUsage').textContent = stack.length + ' nodes';
+        }
+
+        function showMessage(message, type) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-' + type;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            setTimeout(function() {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 3000);
+        }
+
+        function push() {
+            var input = document.getElementById('stackValue');
+            var value = input.value;
+            
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+            
+            var num = parseInt(value);
+            stack.push(num);
+            input.value = '';
+            updateDisplay();
+            showMessage('Pushed ' + num + ' to stack', 'success');
+        }
+
+        function pop() {
+            if (stack.length === 0) {
+                showMessage('Stack Underflow! Linked list is empty', 'error');
+                return;
+            }
+            
+            var poppedValue = stack.pop();
+            updateDisplay();
+            showMessage('Popped value: ' + poppedValue, 'success');
+        }
+
+        function peek() {
+            if (stack.length === 0) {
+                showMessage('Stack is empty! Nothing to peek', 'error');
+                return;
+            }
+            
+            showMessage('Top value: ' + stack[stack.length - 1], 'info');
+        }
+
+        function clearStack() {
+            if (stack.length === 0) {
+                showMessage('Stack is already empty', 'info');
+                return;
+            }
+            
+            stack = [];
+            updateDisplay();
+            showMessage('Stack cleared successfully', 'success');
+        }
+
+        document.getElementById('stackValue').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                push();
+            }
+        });
+
+        updateDisplay();
+        setTimeout(function() {
+            showMessage('Stack initialized with default values: 10, 20, 30', 'info');
+        }, 500);
+    </script>
+</body>
+</html>

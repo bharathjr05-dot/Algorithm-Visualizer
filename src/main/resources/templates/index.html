@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Visualizer</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Algorithm Visualizer</h1>
+        <p>Learn Data Structures and Algorithms through Interactive Visualizations</p>
+        <div class="user-section">
+            <div sec:authorize="isAuthenticated()">
+                <span>Welcome, <span sec:authentication="name"></span>!</span>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+            <div sec:authorize="!isAuthenticated()">
+                <a href="/login">Login</a> | <a href="/register">Register</a>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="algorithm-categories">
+            <div class="category-card">
+                <h2>Sorting Algorithms</h2>
+                <p>Visualize how different sorting algorithms work step by step</p>
+                <a href="/sorting" class="btn">Explore Sorting</a>
+            </div>
+            
+            <div class="category-card">
+                <h2>Data Structures</h2>
+                <p>Interactive visualization of arrays, linked lists, stacks, queues, trees, and graphs</p>
+                <a href="/datastructures" class="btn">Explore Data Structures</a>
+            </div>
+            
+            <div class="category-card">
+                <h2>Analytics Dashboard</h2>
+                <p>View performance statistics and leaderboards</p>
+                <a href="/analytics" class="btn">View Analytics</a>
+            </div>
+            
+            <div class="category-card">
+                <h2>Search Algorithms</h2>
+                <p>Understand linear and binary search techniques</p>
+                <a href="#" class="btn disabled">Coming Soon</a>
+            </div>
+        </div>
+    </main>
+    
+    </main>
+    
+    <div id="statsModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeStats()">&times;</span>
+            <h2>Your Statistics</h2>
+            <div id="userStats"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2024 Algorithm Visualizer - Making DSA Learning Interactive</p>
+    </footer>
+    
+    <script>
+        let currentUser = null;
+        
+        function login() {
+            const username = document.getElementById('username').value;
+            if (!username) return alert('Enter username');
+            
+            fetch('/api/users/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username: username})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = data;
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('userInfo').style.display = 'block';
+                    document.getElementById('welcomeMsg').textContent = `Welcome, ${data.username}!`;
+                } else {
+                    alert('User not found. Registering new user...');
+                    register();
+                }
+            });
+        }
+        
+        function register() {
+            const username = document.getElementById('username').value;
+            if (!username) return alert('Enter username');
+            
+            fetch('/api/users/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: username,
+                    email: username + '@example.com',
+                    password: 'password123',
+                    fullName: username
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('User registered successfully!');
+                login();
+            });
+        }
+        
+        function viewStats() {
+            if (!currentUser) return;
+            
+            fetch(`/api/algorithms/user/${currentUser.userId}/progress`)
+            .then(response => response.json())
+            .then(data => {
+                let statsHtml = '<h3>Your Progress:</h3>';
+                data.forEach(progress => {
+                    statsHtml += `
+                        <div class="stat-item">
+                            <strong>${progress.algorithm.name}</strong><br>
+                            Attempts: ${progress.attempts} | Completed: ${progress.completedAttempts}<br>
+                            Best Score: ${progress.bestScore} | Best Time: ${progress.bestTime}s<br>
+                            Mastery: ${progress.masteryLevel}
+                        </div><br>
+                    `;
+                });
+                document.getElementById('userStats').innerHTML = statsHtml;
+                document.getElementById('statsModal').style.display = 'block';
+            });
+        }
+        
+        function closeStats() {
+            document.getElementById('statsModal').style.display = 'none';
+        }
+        
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('username').value = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linked List Operations - Algorithm Visualizer</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/datastructures.css">
+</head>
+<body>
+    <header>
+        <h1>Linked List Operations Visualizer</h1>
+        <div style="position: absolute; top: 2rem; left: 2rem;">
+            <a href="/datastructures" class="back-btn">← Back to Data Structures</a>
+        </div>
+    </header>
+    
+    <main>
+        <div class="controls">
+            <div class="input-section">
+                <label>Current List:</label>
+                <input type="text" id="linkedlistInput" placeholder="10,20,30,40" value="10,20,30,40">
+                <button onclick="updateLinkedList()">Update List</button>
+            </div>
+            
+            <div class="operation-buttons">
+                <div class="operation-group">
+                    <h4>Insert at Head</h4>
+                    <input type="number" id="insertHeadElement" placeholder="Element" value="5">
+                    <button onclick="performInsertHead()">Insert Head</button>
+                </div>
+                
+                <div class="operation-group">
+                    <h4>Insert at Tail</h4>
+                    <input type="number" id="insertTailElement" placeholder="Element" value="50">
+                    <button onclick="performInsertTail()">Insert Tail</button>
+                </div>
+                
+                <div class="operation-group">
+                    <h4>Delete Head</h4>
+                    <button onclick="performDeleteHead()">Delete Head</button>
+                </div>
+                
+                <div class="operation-group">
+                    <h4>Search Element</h4>
+                    <input type="number" id="searchElement" placeholder="Element" value="20">
+                    <button onclick="performSearch()">Search</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="visualization-area">
+            <div class="playback-controls">
+                <button id="prevBtn" onclick="previousStep()" disabled>Previous</button>
+                <button id="playBtn" onclick="togglePlay()" disabled>Play</button>
+                <button id="nextBtn" onclick="nextStep()" disabled>Next</button>
+                <span id="stepInfo">Step: 0 / 0</span>
+            </div>
+            
+            <div id="linkedlistContainer"></div>
+            <div id="stepDescription">Linked List ready. Select an operation to start visualization</div>
+        </div>
+    </main>
+    
+    <script src="/js/linkedlist.js"></script>
+</body>
+</html>

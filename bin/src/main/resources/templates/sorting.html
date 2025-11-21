@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Algorithms - Algorithm Visualizer</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Sorting Algorithm Visualizer</h1>
+        <a href="/" class="back-btn">← Back to Home</a>
+    </header>
+    
+    <main>
+        <div class="controls">
+            <div class="input-section">
+                <label for="arrayInput">Enter Array (comma-separated):</label>
+                <input type="text" id="arrayInput" placeholder="64,34,25,12,22,11,90" value="64,34,25,12,22,11,90">
+                <button onclick="parseArray()">Set Array</button>
+            </div>
+            
+            <div class="algorithm-buttons">
+                <button onclick="startVisualization('bubble-sort')">Bubble Sort</button>
+                <button onclick="startVisualization('selection-sort')">Selection Sort</button>
+            </div>
+            
+            <div class="playback-controls">
+                <button id="prevBtn" onclick="previousStep()" disabled>Previous</button>
+                <button id="playBtn" onclick="togglePlay()">Play</button>
+                <button id="nextBtn" onclick="nextStep()" disabled>Next</button>
+                <span id="stepInfo">Step: 0 / 0</span>
+            </div>
+        </div>
+        
+        <div class="visualization-area">
+            <div id="arrayContainer"></div>
+            <div id="stepDescription">Select an algorithm to start visualization</div>
+        </div>
+    </main>
+    
+    <script src="/js/sorting.js"></script>
+</body>
+</html>

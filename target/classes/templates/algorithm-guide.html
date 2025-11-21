@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Guide - Algorithm Visualizer</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Sorting Algorithms Explained</h1>
+        <a href="/sorting" class="back-btn">← Back to Visualizer</a>
+    </header>
+    
+    <main style="padding: 2rem; max-width: 1000px; margin: 0 auto;">
+        
+        <div class="algorithm-explanation">
+            <h2>🔄 Insertion Sort</h2>
+            <div class="explanation-content">
+                <h3>How it works:</h3>
+                <p><strong>Think of sorting playing cards in your hand:</strong></p>
+                <ol>
+                    <li>Start with the 2nd card (position 1)</li>
+                    <li>Compare it with cards to the left</li>
+                    <li>Shift larger cards to the right to make space</li>
+                    <li>Insert the card in the correct position</li>
+                    <li>Repeat for all remaining cards</li>
+                </ol>
+                <p><strong>Example:</strong> [5, 2, 4, 6, 1, 3]</p>
+                <p>Take 2, shift 5 right → [2, 5, 4, 6, 1, 3]</p>
+                <p>Take 4, shift 5 right, insert 4 → [2, 4, 5, 6, 1, 3]</p>
+            </div>
+        </div>
+
+        <div class="algorithm-explanation">
+            <h2>⚡ Quick Sort</h2>
+            <div class="explanation-content">
+                <h3>How it works:</h3>
+                <p><strong>Divide and Conquer approach:</strong></p>
+                <ol>
+                    <li>Pick a "pivot" element (usually the last one)</li>
+                    <li>Move all smaller elements to the left of pivot</li>
+                    <li>Move all larger elements to the right of pivot</li>
+                    <li>Now pivot is in its final correct position</li>
+                    <li>Repeat the process for left and right parts</li>
+                </ol>
+                <p><strong>Example:</strong> [64, 34, 25, 12, 22, 11, 90] (pivot = 90)</p>
+                <p>After partition: [64, 34, 25, 12, 22, 11] + [90] + []</p>
+                <p>90 is now in correct position, sort left part recursively</p>
+            </div>
+        </div>
+
+        <div class="algorithm-explanation">
+            <h2>🔀 Merge Sort</h2>
+            <div class="explanation-content">
+                <h3>How it works:</h3>
+                <p><strong>Divide, Sort, and Merge:</strong></p>
+                <ol>
+                    <li>Divide the array into two equal halves</li>
+                    <li>Keep dividing until you have single elements</li>
+                    <li>Merge two sorted halves by comparing elements</li>
+                    <li>Always pick the smaller element first</li>
+                    <li>Continue merging until you get the full sorted array</li>
+                </ol>
+                <p><strong>Example:</strong> [64, 34, 25, 12]</p>
+                <p>Divide: [64, 34] and [25, 12]</p>
+                <p>Divide more: [64], [34] and [25], [12]</p>
+                <p>Merge: [34, 64] and [12, 25]</p>
+                <p>Final merge: [12, 25, 34, 64]</p>
+            </div>
+        </div>
+
+        <div class="comparison-table">
+            <h2>📊 Algorithm Comparison</h2>
+            <table>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Best Case</th>
+                    <th>Average Case</th>
+                    <th>Worst Case</th>
+                    <th>Space</th>
+                    <th>When to Use</th>
+                </tr>
+                <tr>
+                    <td>Bubble Sort</td>
+                    <td>O(n)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(1)</td>
+                    <td>Learning only</td>
+                </tr>
+                <tr>
+                    <td>Selection Sort</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(1)</td>
+                    <td>Small arrays</td>
+                </tr>
+                <tr>
+                    <td>Insertion Sort</td>
+                    <td>O(n)</td>
+                    <td>O(n²)</td>
+                    <td>O(n²)</td>
+                    <td>O(1)</td>
+                    <td>Nearly sorted data</td>
+                </tr>
+                <tr>
+                    <td>Quick Sort</td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(n²)</td>
+                    <td>O(log n)</td>
+                    <td>General purpose</td>
+                </tr>
+                <tr>
+                    <td>Merge Sort</td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(n log n)</td>
+                    <td>O(n)</td>
+                    <td>Stable sorting needed</td>
+                </tr>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
