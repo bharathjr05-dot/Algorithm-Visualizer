@@ -3,6 +3,7 @@
 A comprehensive web application for visualizing and learning algorithms interactively. Built with Spring Boot, MySQL, and modern web technologies.
 
 ## 📋 Table of Contents
+- [Demo](#demo)
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -14,6 +15,14 @@ A comprehensive web application for visualizing and learning algorithms interact
 - [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
+
+## 🎥 Demo
+
+### Merge Sort Visualization
+
+https://github.com/user-attachments/assets/6aab81c3-94a1-435f-998f-83cbd6c853c8
+
+---
 
 ## 📸 Screenshots
 
