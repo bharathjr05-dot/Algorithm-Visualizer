@@ -1,6 +1,6 @@
 -- Create database
 CREATE DATABASE IF NOT EXISTS algorithm_visualizers;
-USE algorithm_visualizer;
+USE algorithm_visualizers;
 
 -- Users table with detailed profile
 CREATE TABLE IF NOT EXISTS users (
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     total_algorithms_completed INT DEFAULT 0,
     total_time_spent INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP,
+    last_login TIMESTAMP NULL,
     is_active BOOLEAN DEFAULT TRUE
 );
 
@@ -407,3 +407,5 @@ CREATE INDEX idx_user_progress_user ON user_progress(user_id);
 CREATE INDEX idx_user_achievements_user ON user_achievements(user_id);
 CREATE INDEX idx_algorithm_feedback_algorithm ON algorithm_feedback(algorithm_id);
 CREATE INDEX idx_user_sessions_date ON user_sessions(session_start);
+
+

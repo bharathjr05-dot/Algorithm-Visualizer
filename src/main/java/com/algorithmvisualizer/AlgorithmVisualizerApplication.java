@@ -8,4 +8,4 @@ public class AlgorithmVisualizerApplication {
     public static void main(String[] args) {
         SpringApplication.run(AlgorithmVisualizerApplication.class, args);
     }
-}
+}   

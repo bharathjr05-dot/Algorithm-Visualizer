@@ -5,53 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Algorithm Visualizer</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <header>
-        <h1>Algorithm Visualizer</h1>
-        <p>Learn Data Structures and Algorithms through Interactive Visualizations</p>
-        <div class="user-section">
-            <div sec:authorize="isAuthenticated()">
-                <span>Welcome, <span sec:authentication="name"></span>!</span>
-                <form th:action="@{/logout}" method="post" style="display: inline;">
-                    <button type="submit">Logout</button>
-                </form>
-            </div>
-            <div sec:authorize="!isAuthenticated()">
-                <a href="/login">Login</a> | <a href="/register">Register</a>
+<body class="homepage">
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Algorithm Visualizer</h1>
+            <p class="hero-subtitle">Master Data Structures and Algorithms through Interactive Visualizations</p>
+            <div class="user-section">
+                <div sec:authorize="isAuthenticated()" class="auth-welcome">
+                    <span class="welcome-text">Welcome back, <span sec:authentication="name" class="username"></span>!</span>
+                    <form th:action="@{/logout}" method="post" class="logout-form">
+                        <button type="submit" class="btn-logout">Logout</button>
+                    </form>
+                </div>
+                <div sec:authorize="!isAuthenticated()" class="auth-links">
+                    <a href="/login" class="auth-link">Login</a>
+                    <a href="/register" class="auth-link register">Register</a>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
     
-    <main>
-        <div class="algorithm-categories">
-            <div class="category-card">
-                <h2>Sorting Algorithms</h2>
-                <p>Visualize how different sorting algorithms work step by step</p>
-                <a href="/sorting" class="btn">Explore Sorting</a>
+    <main class="main-content">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 6h18l-2 13H5L3 6z"/>
+                        <path d="M16 10V6a4 4 0 0 0-8 0v4"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Sorting Algorithms</h3>
+                <p class="feature-description">Visualize bubble sort, merge sort, quick sort, and more with step-by-step animations</p>
+                <a href="/sorting" class="feature-btn">Explore Sorting</a>
             </div>
             
-            <div class="category-card">
-                <h2>Data Structures</h2>
-                <p>Interactive visualization of arrays, linked lists, stacks, queues, trees, and graphs</p>
-                <a href="/datastructures" class="btn">Explore Data Structures</a>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6"/>
+                        <path d="m21 12-6-3-6 3-6-3"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Data Structures</h3>
+                <p class="feature-description">Interactive visualization of arrays, linked lists, stacks, queues, trees, and graphs</p>
+                <a href="/datastructures" class="feature-btn">Explore Data Structures</a>
             </div>
             
-            <div class="category-card">
-                <h2>Analytics Dashboard</h2>
-                <p>View performance statistics and leaderboards</p>
-                <a href="/analytics" class="btn">View Analytics</a>
-            </div>
-            
-            <div class="category-card">
-                <h2>Search Algorithms</h2>
-                <p>Understand linear and binary search techniques</p>
-                <a href="#" class="btn disabled">Coming Soon</a>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Search Algorithms</h3>
+                <p class="feature-description">Understand linear search, binary search, and advanced searching techniques</p>
+                <a href="/searching" class="feature-btn">Explore Searching</a>
             </div>
         </div>
     </main>
-    
-    </main>
+
     
     <div id="statsModal" class="modal" style="display:none;">
         <div class="modal-content">
@@ -61,7 +77,7 @@
         </div>
     </div>
     
-    <footer>
+    <footer class="homepage-footer">
         <p>&copy; 2024 Algorithm Visualizer - Making DSA Learning Interactive</p>
     </footer>
     

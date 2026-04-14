@@ -103,7 +103,12 @@ INSERT IGNORE INTO algorithms (name, category, difficulty_level, description, ti
 ('Array Operations', 'Data Structures', 'EASY', 'Basic array insertion, deletion, search', 'O(n)', 'O(1)'),
 ('Linked List Operations', 'Data Structures', 'EASY', 'Basic linked list operations', 'O(n)', 'O(1)'),
 ('Stack Operations', 'Data Structures', 'EASY', 'LIFO data structure operations', 'O(1)', 'O(n)'),
-('Queue Operations', 'Data Structures', 'EASY', 'FIFO data structure operations', 'O(1)', 'O(n)');
+('Queue Operations', 'Data Structures', 'EASY', 'FIFO data structure operations', 'O(1)', 'O(n)'),
+
+-- Graph Algorithms
+('Depth-First Search (DFS)', 'Graph Algorithms', 'MEDIUM', 'Graph traversal using stack/recursion', 'O(V + E)', 'O(V)'),
+('Breadth-First Search (BFS)', 'Graph Algorithms', 'MEDIUM', 'Graph traversal using queue', 'O(V + E)', 'O(V)'),
+('Dijkstra Algorithm', 'Graph Algorithms', 'HARD', 'Shortest path algorithm for weighted graphs', 'O((V + E) log V)', 'O(V)');
 
 -- Create indexes for better performance
 CREATE INDEX idx_users_username ON users(username);

@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Tree Visualization - Algorithm Visualizer</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/datastructures.css}">
+    <style>
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            min-height: 400px;
+            max-height: 600px;
+            overflow: auto;
+            position: relative;
+        }
+        .tree-node {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 5px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        .tree-node.root {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        }
+        .tree-node.visiting {
+            background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+            transform: scale(1.3);
+            animation: pulse 0.8s ease-in-out;
+        }
+        .tree-node.found {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            animation: bounce 0.6s ease-in-out;
+        }
+        .tree-node.inserting {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            animation: insertPulse 1s ease-in-out;
+        }
+        .tree-level {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        .traversal-result {
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #333;
+        }
+        .animation-status {
+            background: rgba(255,255,255,0.95);
+            padding: 8px 16px;
+            border-radius: 15px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #667eea;
+            min-height: 20px;
+        }
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        .message-success { background: linear-gradient(135deg, #00b894 0%, #00a085 100%); }
+        .message-error { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%); }
+        .message-info { background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1.3); }
+            50% { transform: scale(1.5); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1.4); }
+            75% { transform: scale(1.2); }
+        }
+        @keyframes insertPulse {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        @keyframes slideOut {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-20px) scale(1.1); opacity: 0.7; }
+            100% { transform: translateY(50px) scale(0); opacity: 0; }
+        }
+        .operation-description {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+        .operation-description h4 {
+            color: #667eea;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .operation-step {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .tree-arrows {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .connection-label {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Binary Tree Visualization</h1>
+        <a href="/datastructures" class="back-btn">← Back to Data Structures</a>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="number" id="treeValue" placeholder="Enter value (1-100)" min="1" max="100">
+                <button onclick="insertNodeAnimated()" class="btn-primary">➕ Insert</button>
+            </div>
+            <div class="button-group">
+                <button onclick="deleteNode()" class="btn-danger">➖ Delete</button>
+                <button onclick="searchNodeAnimated()" class="btn-info">🔍 Search</button>
+                <button onclick="clearTree()" class="btn-warning">🗑️ Clear</button>
+            </div>
+            <div class="button-group">
+                <button onclick="inorderTraversalAnimated()" class="btn-info">📋 Inorder</button>
+                <button onclick="preorderTraversalAnimated()" class="btn-info">📋 Preorder</button>
+                <button onclick="postorderTraversalAnimated()" class="btn-info">📋 Postorder</button>
+            </div>
+        </div>
+
+        <div class="animation-status" id="animationStatus">Ready for operations</div>
+        
+        <!-- Operation Description Box -->
+        <div class="operation-description" id="operationDescription">
+            <h4>🔄 Current Operation: Ready</h4>
+            <div id="operationSteps">
+                <div class="operation-step">💡 Select an operation above to see step-by-step execution</div>
+                <div class="operation-step">📋 Traversal Order: Root → Left → Right (Pre-order)</div>
+                <div class="operation-step">🔍 Search/Insert/Delete: O(log n) average time complexity</div>
+            </div>
+        </div>
+
+        <div class="visualization-area">
+            <div class="tree-container" id="treeContainer">
+                <div class="traversal-result" id="traversalResult">Tree: 50, 30, 70, 20, 40, 60, 80</div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>📊 Binary Tree Information</h3>
+            <div>
+                <div class="info-item">
+                    <span class="info-label">📏 Size:</span>
+                    <span id="treeSize" class="info-value">7</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📐 Height:</span>
+                    <span id="treeHeight" class="info-value">3</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">🌳 Root:</span>
+                    <span id="rootValue" class="info-value">50</span>
+                </div>
+            </div>
+            <div class="operation-help">
+                <h4>💡 Binary Search Tree Properties:</h4>
+                <ul>
+                    <li><strong>Left child:</strong> Always smaller than parent</li>
+                    <li><strong>Right child:</strong> Always greater than parent</li>
+                    <li><strong>Inorder:</strong> Left → Root → Right (sorted order)</li>
+                    <li><strong>Search/Insert/Delete:</strong> O(log n) average time</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TreeNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+        var root = null;
+        var size = 0;
+        var isAnimating = false;
+
+        function initializeTree() {
+            root = new TreeNode(50);
+            root.left = new TreeNode(30);
+            root.right = new TreeNode(70);
+            root.left.left = new TreeNode(20);
+            root.left.right = new TreeNode(40);
+            root.right.left = new TreeNode(60);
+            root.right.right = new TreeNode(80);
+            size = 7;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            var container = document.getElementById('treeContainer');
+            var html = '<div class="traversal-result" id="traversalResult">Tree: ';
+            
+            if (root) {
+                var nodes = [];
+                inorderHelper(root, nodes);
+                html += nodes.join(', ');
+            } else {
+                html += 'Empty';
+            }
+            html += '</div>';
+            
+            if (root) {
+                html += drawTree();
+            }
+            
+            container.innerHTML = html;
+            
+            document.getElementById('treeSize').textContent = size;
+            document.getElementById('treeHeight').textContent = getHeight(root);
+            document.getElementById('rootValue').textContent = root ? root.value : 'None';
+        }
+
+        function drawTree() {
+            if (!root) return '<div style="text-align: center; padding: 50px;">Tree is empty</div>';
+            
+            var positions = calculatePositions(root);
+            var bounds = calculateBounds(positions);
+            var width = Math.max(800, bounds.maxX - bounds.minX + 100);
+            var height = Math.max(400, bounds.maxY - bounds.minY + 100);
+            
+            var svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="background: #f8f9fa; border-radius: 10px; max-width: 100%; height: auto;">`;
+            
+            svg += '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#666" /></marker></defs>';
+            
+            // Draw edges first
+            svg += drawEdges(root, positions);
+            
+            // Draw nodes
+            svg += drawNodes(root, positions);
+            
+            svg += '</svg>';
+            return svg;
+        }
+        
+        function calculatePositions(node) {
+            var positions = {};
+            var treeHeight = getHeight(root);
+            var baseWidth = Math.max(800, treeHeight * 200);
+            var startX = baseWidth / 2;
+            
+            var queue = [{node: node, x: startX, y: 80, level: 0}];
+            
+            while (queue.length > 0) {
+                var {node: current, x, y, level} = queue.shift();
+                positions[current.value] = {x: x, y: y, level: level};
+                
+                var offset = Math.max(60, baseWidth / Math.pow(2, level + 2));
+                
+                if (current.left) {
+                    queue.push({node: current.left, x: x - offset, y: y + 100, level: level + 1});
+                }
+                if (current.right) {
+                    queue.push({node: current.right, x: x + offset, y: y + 100, level: level + 1});
+                }
+            }
+            
+            return positions;
+        }
+        
+        function calculateBounds(positions) {
+            var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            
+            for (var value in positions) {
+                var pos = positions[value];
+                minX = Math.min(minX, pos.x - 40);
+                maxX = Math.max(maxX, pos.x + 40);
+                minY = Math.min(minY, pos.y - 40);
+                maxY = Math.max(maxY, pos.y + 40);
+            }
+            
+            return {minX: minX, maxX: maxX, minY: minY, maxY: maxY};
+        }
+        
+        function drawEdges(node, positions) {
+            if (!node) return '';
+            
+            var edges = '';
+            var pos = positions[node.value];
+            
+            if (node.left) {
+                var leftPos = positions[node.left.value];
+                edges += `<line stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" x1="${pos.x}" y1="${pos.y + 30}" x2="${leftPos.x}" y2="${leftPos.y - 30}" />`;
+                edges += drawEdges(node.left, positions);
+            }
+            
+            if (node.right) {
+                var rightPos = positions[node.right.value];
+                edges += `<line stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" x1="${pos.x}" y1="${pos.y + 30}" x2="${rightPos.x}" y2="${rightPos.y - 30}" />`;
+                edges += drawEdges(node.right, positions);
+            }
+            
+            return edges;
+        }
+        
+        function drawNodes(node, positions) {
+            if (!node) return '';
+            
+            var nodes = '';
+            var pos = positions[node.value];
+            var className = node === root ? 'tree-node root' : 'tree-node';
+            
+            nodes += `<circle class="${className}" cx="${pos.x}" cy="${pos.y}" r="30" data-value="${node.value}" style="fill: #667eea; stroke: #fff; stroke-width: 2;" />`;
+            nodes += `<text x="${pos.x}" y="${pos.y}" text-anchor="middle" dominant-baseline="central" fill="white" font-family="Arial" font-size="14" font-weight="bold">${node.value}</text>`;
+            
+            if (node.left) {
+                nodes += drawNodes(node.left, positions);
+            }
+            if (node.right) {
+                nodes += drawNodes(node.right, positions);
+            }
+            
+            return nodes;
+        }
+        
+
+
+        async function insertNodeAnimated() {
+            if (isAnimating) return;
+            
+            var input = document.getElementById('treeValue');
+            var value = input.value;
+            
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+            
+            var num = parseInt(value);
+            isAnimating = true;
+            
+            document.getElementById('animationStatus').textContent = 'Inserting ' + num + '...';
+            
+            if (root === null) {
+                root = new TreeNode(num);
+                size = 1;
+                updateDisplay();
+                highlightNode(num, 'inserting');
+                await sleep(1000);
+            } else {
+                var path = [];
+                if (await insertHelperAnimated(root, num, path)) {
+                    size++;
+                } else {
+                    showMessage('Value ' + num + ' already exists', 'error');
+                    isAnimating = false;
+                    document.getElementById('animationStatus').textContent = 'Ready for operations';
+                    return;
+                }
+            }
+            
+            input.value = '';
+            updateDisplay();
+            showMessage('Inserted ' + num + ' into tree', 'success');
+            isAnimating = false;
+            document.getElementById('animationStatus').textContent = 'Ready for operations';
+        }
+
+        async function insertHelperAnimated(node, value, path) {
+            highlightNode(node.value, 'visiting');
+            updateOperationDescription('Insert Operation', [
+                '🔍 Comparing ' + value + ' with ' + node.value,
+                '📍 Current path: ' + path.concat([node.value]).join(' → '),
+                '⚡ BST Property: Left < Root < Right'
+            ]);
+            document.getElementById('animationStatus').textContent = 'Comparing ' + value + ' with ' + node.value;
+            await sleep(800);
+            
+            if (value === node.value) {
+                clearHighlights();
+                return false;
+            }
+            
+            if (value < node.value) {
+                updateOperationDescription('Insert Operation', [
+                    '⬅️ ' + value + ' < ' + node.value + ', going to left subtree',
+                    '📍 Path: ' + path.concat([node.value]).join(' → ') + ' → LEFT',
+                    '🎯 Looking for empty left child position'
+                ]);
+                document.getElementById('animationStatus').textContent = value + ' < ' + node.value + ', going left';
+                await sleep(600);
+                
+                if (node.left === null) {
+                    node.left = new TreeNode(value);
+                    updateDisplay();
+                    highlightNode(value, 'inserting');
+                    updateOperationDescription('Insert Operation', [
+                        '✅ Found empty left position!',
+                        '🆕 Inserted ' + value + ' as left child of ' + node.value,
+                        '🎉 Insertion completed successfully'
+                    ]);
+                    document.getElementById('animationStatus').textContent = 'Inserted ' + value + ' as left child';
+                    await sleep(1000);
+                    clearHighlights();
+                    return true;
+                } else {
+                    clearHighlights();
+                    return await insertHelperAnimated(node.left, value, path);
+                }
+            } else {
+                updateOperationDescription('Insert Operation', [
+                    '➡️ ' + value + ' > ' + node.value + ', going to right subtree',
+                    '📍 Path: ' + path.concat([node.value]).join(' → ') + ' → RIGHT',
+                    '🎯 Looking for empty right child position'
+                ]);
+                document.getElementById('animationStatus').textContent = value + ' > ' + node.value + ', going right';
+                await sleep(600);
+                
+                if (node.right === null) {
+                    node.right = new TreeNode(value);
+                    updateDisplay();
+                    highlightNode(value, 'inserting');
+                    updateOperationDescription('Insert Operation', [
+                        '✅ Found empty right position!',
+                        '🆕 Inserted ' + value + ' as right child of ' + node.value,
+                        '🎉 Insertion completed successfully'
+                    ]);
+                    document.getElementById('animationStatus').textContent = 'Inserted ' + value + ' as right child';
+                    await sleep(1000);
+                    clearHighlights();
+                    return true;
+                } else {
+                    clearHighlights();
+                    return await insertHelperAnimated(node.right, value, path);
+                }
+            }
+        }
+
+        async function searchNodeAnimated() {
+            if (isAnimating) return;
+            
+            var input = document.getElementById('treeValue');
+            var value = input.value;
+            
+            if (!value) {
+                showMessage('Please enter a value to search', 'error');
+                return;
+            }
+            
+            var num = parseInt(value);
+            isAnimating = true;
+            
+            document.getElementById('animationStatus').textContent = 'Searching for ' + num + '...';
+            
+            var found = await searchHelperAnimated(root, num);
+            
+            if (found) {
+                showMessage('Found ' + num + ' in tree', 'success');
+            } else {
+                showMessage('Value ' + num + ' not found', 'error');
+            }
+            
+            isAnimating = false;
+            document.getElementById('animationStatus').textContent = 'Ready for operations';
+        }
+
+        async function searchHelperAnimated(node, value) {
+            if (node === null) {
+                document.getElementById('animationStatus').textContent = 'Reached null node - value not found';
+                await sleep(800);
+                return false;
+            }
+            
+            highlightNode(node.value, 'visiting');
+            document.getElementById('animationStatus').textContent = 'Checking node ' + node.value;
+            await sleep(800);
+            
+            if (value === node.value) {
+                highlightNode(node.value, 'found');
+                document.getElementById('animationStatus').textContent = 'Found ' + value + '!';
+                await sleep(1000);
+                clearHighlights();
+                return true;
+            }
+            
+            if (value < node.value) {
+                document.getElementById('animationStatus').textContent = value + ' < ' + node.value + ', searching left';
+                await sleep(600);
+                clearHighlights();
+                return await searchHelperAnimated(node.left, value);
+            } else {
+                document.getElementById('animationStatus').textContent = value + ' > ' + node.value + ', searching right';
+                await sleep(600);
+                clearHighlights();
+                return await searchHelperAnimated(node.right, value);
+            }
+        }
+
+        async function inorderTraversalAnimated() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            var result = [];
+            document.getElementById('animationStatus').textContent = 'Starting inorder traversal (Left → Root → Right)';
+            await sleep(800);
+            
+            await inorderHelperAnimated(root, result);
+            
+            document.getElementById('traversalResult').textContent = 'Inorder: ' + result.join(', ');
+            showMessage('Inorder traversal completed', 'info');
+            isAnimating = false;
+            document.getElementById('animationStatus').textContent = 'Ready for operations';
+        }
+
+        async function inorderHelperAnimated(node, result) {
+            if (node !== null) {
+                await inorderHelperAnimated(node.left, result);
+                
+                highlightNode(node.value, 'visiting');
+                document.getElementById('animationStatus').textContent = 'Visiting node ' + node.value;
+                result.push(node.value);
+                await sleep(800);
+                clearHighlights();
+                
+                await inorderHelperAnimated(node.right, result);
+            }
+        }
+
+        async function preorderTraversalAnimated() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            var result = [];
+            document.getElementById('animationStatus').textContent = 'Starting preorder traversal (Root → Left → Right)';
+            await sleep(800);
+            
+            await preorderHelperAnimated(root, result);
+            
+            document.getElementById('traversalResult').textContent = 'Preorder: ' + result.join(', ');
+            showMessage('Preorder traversal completed', 'info');
+            isAnimating = false;
+            document.getElementById('animationStatus').textContent = 'Ready for operations';
+        }
+
+        async function preorderHelperAnimated(node, result) {
+            if (node !== null) {
+                highlightNode(node.value, 'visiting');
+                document.getElementById('animationStatus').textContent = 'Visiting node ' + node.value;
+                result.push(node.value);
+                await sleep(800);
+                clearHighlights();
+                
+                await preorderHelperAnimated(node.left, result);
+                await preorderHelperAnimated(node.right, result);
+            }
+        }
+
+        async function postorderTraversalAnimated() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            var result = [];
+            document.getElementById('animationStatus').textContent = 'Starting postorder traversal (Left → Right → Root)';
+            await sleep(800);
+            
+            await postorderHelperAnimated(root, result);
+            
+            document.getElementById('traversalResult').textContent = 'Postorder: ' + result.join(', ');
+            showMessage('Postorder traversal completed', 'info');
+            isAnimating = false;
+            document.getElementById('animationStatus').textContent = 'Ready for operations';
+        }
+
+        async function postorderHelperAnimated(node, result) {
+            if (node !== null) {
+                await postorderHelperAnimated(node.left, result);
+                await postorderHelperAnimated(node.right, result);
+                
+                highlightNode(node.value, 'visiting');
+                document.getElementById('animationStatus').textContent = 'Visiting node ' + node.value;
+                result.push(node.value);
+                await sleep(800);
+                clearHighlights();
+            }
+        }
+
+        function highlightNode(value, className) {
+            var nodes = document.querySelectorAll('circle[data-value]');
+            nodes.forEach(function(node) {
+                if (parseInt(node.dataset.value) === value) {
+                    if (className === 'visiting') {
+                        node.style.fill = '#feca57';
+                        node.style.transform = 'scale(1.3)';
+                        node.style.animation = 'pulse 0.8s ease-in-out';
+                    } else if (className === 'found') {
+                        node.style.fill = '#00b894';
+                        node.style.animation = 'bounce 0.6s ease-in-out';
+                    } else if (className === 'inserting') {
+                        node.style.fill = '#ff6b6b';
+                        node.style.animation = 'insertPulse 1s ease-in-out';
+                    }
+                }
+            });
+        }
+
+        function clearHighlights() {
+            var nodes = document.querySelectorAll('circle[data-value]');
+            nodes.forEach(function(node) {
+                var value = parseInt(node.dataset.value);
+                node.style.fill = '#667eea';
+                node.style.transform = 'scale(1)';
+                node.style.animation = '';
+                if (root && value === root.value) {
+                    node.style.fill = '#00b894';
+                }
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function deleteNode() {
+            if (isAnimating) return;
+            
+            var input = document.getElementById('treeValue');
+            var value = input.value;
+            
+            if (!value) {
+                showMessage('Please enter a value to delete', 'error');
+                return;
+            }
+            
+            var num = parseInt(value);
+            isAnimating = true;
+            
+            document.getElementById('animationStatus').textContent = 'Searching for ' + num + ' to delete...';
+            
+            var result = await deleteHelperAnimated(root, num, null, '');
+            
+            if (result.deleted) {
+                root = result.newRoot;
+                size--;
+                input.value = '';
+                updateDisplay();
+                showMessage('Successfully deleted ' + num + ' from tree', 'success');
+            } else {
+                showMessage('Value ' + num + ' not found in tree', 'error');
+            }
+            
+            isAnimating = false;
+            document.getElementById('animationStatus').textContent = 'Ready for operations';
+        }
+
+        async function deleteHelperAnimated(node, value, parent, direction) {
+            if (node === null) {
+                document.getElementById('animationStatus').textContent = 'Value ' + value + ' not found in tree';
+                await sleep(800);
+                return { deleted: false, newRoot: null };
+            }
+            
+            // Highlight current node being examined
+            highlightNode(node.value, 'visiting');
+            document.getElementById('animationStatus').textContent = 'Examining node ' + node.value + ' (searching for ' + value + ')';
+            await sleep(800);
+            
+            if (value < node.value) {
+                document.getElementById('animationStatus').textContent = value + ' < ' + node.value + ', searching left subtree';
+                await sleep(600);
+                clearHighlights();
+                var result = await deleteHelperAnimated(node.left, value, node, 'left');
+                if (result.deleted) {
+                    node.left = result.newRoot;
+                }
+                return { deleted: result.deleted, newRoot: node };
+            } else if (value > node.value) {
+                document.getElementById('animationStatus').textContent = value + ' > ' + node.value + ', searching right subtree';
+                await sleep(600);
+                clearHighlights();
+                var result = await deleteHelperAnimated(node.right, value, node, 'right');
+                if (result.deleted) {
+                    node.right = result.newRoot;
+                }
+                return { deleted: result.deleted, newRoot: node };
+            } else {
+                // Found the node to delete
+                highlightNode(node.value, 'found');
+                document.getElementById('animationStatus').textContent = 'Found ' + value + '! Analyzing deletion cases...';
+                await sleep(1000);
+                
+                // Case 1: Leaf node (no children)
+                if (node.left === null && node.right === null) {
+                    document.getElementById('animationStatus').textContent = 'Case 1: ' + value + ' is a leaf node - simply removing it';
+                    await sleep(1000);
+                    
+                    // Animate deletion
+                    var nodeElement = document.querySelector('[data-value="' + value + '"]');
+                    if (nodeElement) {
+                        nodeElement.style.animation = 'fadeOut 0.8s ease-out';
+                        nodeElement.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)';
+                    }
+                    await sleep(800);
+                    
+                    return { deleted: true, newRoot: null };
+                }
+                
+                // Case 2: Node with only right child
+                if (node.left === null) {
+                    document.getElementById('animationStatus').textContent = 'Case 2: ' + value + ' has only right child - replacing with right subtree';
+                    await sleep(1000);
+                    
+                    var nodeElement = document.querySelector('[data-value="' + value + '"]');
+                    if (nodeElement) {
+                        nodeElement.style.animation = 'slideOut 0.8s ease-out';
+                        nodeElement.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)';
+                    }
+                    await sleep(800);
+                    
+                    return { deleted: true, newRoot: node.right };
+                }
+                
+                // Case 3: Node with only left child
+                if (node.right === null) {
+                    document.getElementById('animationStatus').textContent = 'Case 3: ' + value + ' has only left child - replacing with left subtree';
+                    await sleep(1000);
+                    
+                    var nodeElement = document.querySelector('[data-value="' + value + '"]');
+                    if (nodeElement) {
+                        nodeElement.style.animation = 'slideOut 0.8s ease-out';
+                        nodeElement.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)';
+                    }
+                    await sleep(800);
+                    
+                    return { deleted: true, newRoot: node.left };
+                }
+                
+                // Case 4: Node with both children
+                document.getElementById('animationStatus').textContent = 'Case 4: ' + value + ' has both children - finding inorder successor';
+                await sleep(1000);
+                
+                var successor = findMin(node.right);
+                highlightNode(successor.value, 'found');
+                document.getElementById('animationStatus').textContent = 'Inorder successor found: ' + successor.value + ' (replacing ' + value + ')';
+                await sleep(1200);
+                
+                // Replace value
+                node.value = successor.value;
+                clearHighlights();
+                updateDisplay();
+                highlightNode(successor.value, 'inserting');
+                document.getElementById('animationStatus').textContent = 'Replaced ' + value + ' with ' + successor.value + ', now deleting duplicate';
+                await sleep(1000);
+                
+                // Delete the successor (which will be a leaf or have only right child)
+                var result = await deleteHelperAnimated(node.right, successor.value, node, 'right');
+                node.right = result.newRoot;
+                
+                clearHighlights();
+                return { deleted: true, newRoot: node };
+            }
+        }
+
+        function findMin(node) {
+            while (node.left !== null) {
+                node = node.left;
+            }
+            return node;
+        }
+
+        function inorderHelper(node, result) {
+            if (node !== null) {
+                inorderHelper(node.left, result);
+                result.push(node.value);
+                inorderHelper(node.right, result);
+            }
+        }
+
+        function getHeight(node) {
+            if (node === null) return 0;
+            return 1 + Math.max(getHeight(node.left), getHeight(node.right));
+        }
+
+        function clearTree() {
+            if (root === null) {
+                showMessage('Tree is already empty', 'info');
+                return;
+            }
+            
+            root = null;
+            size = 0;
+            updateDisplay();
+            showMessage('Tree cleared successfully', 'success');
+        }
+
+        function showMessage(message, type) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-' + type;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            setTimeout(function() {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 3000);
+        }
+
+        document.getElementById('treeValue').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                insertNodeAnimated();
+            }
+        });
+
+        function updateOperationDescription(title, steps) {
+            var descriptionElement = document.getElementById('operationDescription');
+            if (descriptionElement) {
+                var html = '<h4>🔄 Current Operation: ' + title + '</h4><div id="operationSteps">';
+                steps.forEach(function(step) {
+                    html += '<div class="operation-step">' + step + '</div>';
+                });
+                html += '</div>';
+                descriptionElement.innerHTML = html;
+            }
+        }
+        
+        initializeTree();
+        setTimeout(function() {
+            showMessage('Binary tree initialized with default values', 'info');
+            updateOperationDescription('Ready', [
+                '💡 Select an operation above to see step-by-step execution',
+                '📋 Traversal Order: Root → Left → Right (Pre-order)',
+                '🔍 Search/Insert/Delete: O(log n) average time complexity'
+            ]);
+        }, 500);
+    </script>
+</body>
+</html>

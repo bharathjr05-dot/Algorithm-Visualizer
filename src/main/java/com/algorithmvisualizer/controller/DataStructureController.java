@@ -12,22 +12,34 @@ public class DataStructureController {
     // Array Operations
     @PostMapping("/array/insert")
     public List<DataStructureStep> arrayInsert(@RequestBody Map<String, Object> request) {
-        int[] array = ((List<Integer>) request.get("array")).stream().mapToInt(i -> i).toArray();
+        if (request.get("array") == null || request.get("element") == null || request.get("position") == null) {
+            throw new IllegalArgumentException("Missing required parameters");
+        }
+        @SuppressWarnings("unchecked")
+        List<Integer> arrayList = (List<Integer>) request.get("array");
+        int[] array = arrayList.stream().mapToInt(Integer::intValue).toArray();
         int element = (Integer) request.get("element");
         int position = (Integer) request.get("position");
+        if (position < 0 || position > array.length) {
+            throw new IndexOutOfBoundsException("Position must be between 0 and " + array.length);
+        }
         return ArrayOperations.insertElement(array, element, position);
     }
     
     @PostMapping("/array/delete")
     public List<DataStructureStep> arrayDelete(@RequestBody Map<String, Object> request) {
-        int[] array = ((List<Integer>) request.get("array")).stream().mapToInt(i -> i).toArray();
+        @SuppressWarnings("unchecked")
+        List<Integer> arrayList = (List<Integer>) request.get("array");
+        int[] array = arrayList.stream().mapToInt(Integer::intValue).toArray();
         int position = (Integer) request.get("position");
         return ArrayOperations.deleteElement(array, position);
     }
     
     @PostMapping("/array/search")
     public List<DataStructureStep> arraySearch(@RequestBody Map<String, Object> request) {
-        int[] array = ((List<Integer>) request.get("array")).stream().mapToInt(i -> i).toArray();
+        @SuppressWarnings("unchecked")
+        List<Integer> arrayList = (List<Integer>) request.get("array");
+        int[] array = arrayList.stream().mapToInt(Integer::intValue).toArray();
         int element = (Integer) request.get("element");
         return ArrayOperations.searchElement(array, element);
     }
@@ -35,6 +47,7 @@ public class DataStructureController {
     // Linked List Operations
     @PostMapping("/linkedlist/insert-head")
     public List<DataStructureStep> linkedListInsertHead(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> list = (List<Integer>) request.get("list");
         int element = (Integer) request.get("element");
         return LinkedListOperations.insertAtBeginning(list, element);
@@ -42,6 +55,7 @@ public class DataStructureController {
     
     @PostMapping("/linkedlist/insert-tail")
     public List<DataStructureStep> linkedListInsertTail(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> list = (List<Integer>) request.get("list");
         int element = (Integer) request.get("element");
         return LinkedListOperations.insertAtEnd(list, element);
@@ -49,12 +63,14 @@ public class DataStructureController {
     
     @PostMapping("/linkedlist/delete-head")
     public List<DataStructureStep> linkedListDeleteHead(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> list = (List<Integer>) request.get("list");
         return LinkedListOperations.deleteFromBeginning(list);
     }
     
     @PostMapping("/linkedlist/search")
     public List<DataStructureStep> linkedListSearch(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> list = (List<Integer>) request.get("list");
         int element = (Integer) request.get("element");
         return LinkedListOperations.searchElement(list, element);
@@ -63,6 +79,7 @@ public class DataStructureController {
     // Stack Operations
     @PostMapping("/stack/push")
     public List<DataStructureStep> stackPush(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> stack = (List<Integer>) request.get("stack");
         int element = (Integer) request.get("element");
         return StackOperations.pushElement(stack, element);
@@ -70,12 +87,14 @@ public class DataStructureController {
     
     @PostMapping("/stack/pop")
     public List<DataStructureStep> stackPop(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> stack = (List<Integer>) request.get("stack");
         return StackOperations.popElement(stack);
     }
     
     @PostMapping("/stack/peek")
     public List<DataStructureStep> stackPeek(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> stack = (List<Integer>) request.get("stack");
         return StackOperations.peekElement(stack);
     }
@@ -83,6 +102,7 @@ public class DataStructureController {
     // Queue Operations
     @PostMapping("/queue/enqueue")
     public List<DataStructureStep> queueEnqueue(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> queue = (List<Integer>) request.get("queue");
         int element = (Integer) request.get("element");
         return QueueOperations.enqueueElement(queue, element);
@@ -90,12 +110,14 @@ public class DataStructureController {
     
     @PostMapping("/queue/dequeue")
     public List<DataStructureStep> queueDequeue(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> queue = (List<Integer>) request.get("queue");
         return QueueOperations.dequeueElement(queue);
     }
     
     @PostMapping("/queue/front")
     public List<DataStructureStep> queueFront(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
         List<Integer> queue = (List<Integer>) request.get("queue");
         return QueueOperations.frontElement(queue);
     }

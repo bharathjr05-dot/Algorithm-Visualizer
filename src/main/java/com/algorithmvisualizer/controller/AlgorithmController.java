@@ -1,6 +1,7 @@
 package com.algorithmvisualizer.controller;
 
 import com.algorithmvisualizer.algorithm.SortingAlgorithms;
+import com.algorithmvisualizer.algorithm.SearchingAlgorithms;
 import com.algorithmvisualizer.model.*;
 import com.algorithmvisualizer.service.*;
 import com.algorithmvisualizer.repository.*;
@@ -87,6 +88,11 @@ public class AlgorithmController {
         return SortingAlgorithms.mergeSort(array);
     }
     
+    @PostMapping("/heap-sort")
+    public List<AlgorithmStep> heapSort(@RequestBody int[] array) {
+        return SortingAlgorithms.heapSort(array);
+    }
+    
     @GetMapping("/user/{userId}/progress")
     public List<UserProgress> getUserProgress(@PathVariable Long userId) {
         return sessionService.getUserProgress(userId);
@@ -107,9 +113,48 @@ public class AlgorithmController {
         return algorithmRepository.getAlgorithmDifficultyAnalysis();
     }
     
+    // Searching Algorithm Endpoints
+    @PostMapping("/linear-search")
+    public List<AlgorithmStep> linearSearch(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Integer> arrayList = (List<Integer>) request.get("array");
+        int[] array = arrayList.stream().mapToInt(Integer::intValue).toArray();
+        int target = (Integer) request.get("target");
+        return SearchingAlgorithms.linearSearch(array, target);
+    }
+    
+    @PostMapping("/binary-search")
+    public List<AlgorithmStep> binarySearch(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Integer> arrayList = (List<Integer>) request.get("array");
+        int[] array = arrayList.stream().mapToInt(Integer::intValue).toArray();
+        int target = (Integer) request.get("target");
+        return SearchingAlgorithms.binarySearch(array, target);
+    }
+    
+    @PostMapping("/jump-search")
+    public List<AlgorithmStep> jumpSearch(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Integer> arrayList = (List<Integer>) request.get("array");
+        int[] array = arrayList.stream().mapToInt(Integer::intValue).toArray();
+        int target = (Integer) request.get("target");
+        return SearchingAlgorithms.jumpSearch(array, target);
+    }
+    
+    @PostMapping("/interpolation-search")
+    public List<AlgorithmStep> interpolationSearch(@RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Integer> arrayList = (List<Integer>) request.get("array");
+        int[] array = arrayList.stream().mapToInt(Integer::intValue).toArray();
+        int target = (Integer) request.get("target");
+        return SearchingAlgorithms.interpolationSearch(array, target);
+    }
+    
     @GetMapping("/demo/{algorithm}")
     public List<AlgorithmStep> getDemoSteps(@PathVariable String algorithm) {
         int[] demoArray = {64, 34, 25, 12, 22, 11, 90};
+        int[] sortedArray = {11, 12, 22, 25, 34, 64, 90};
+        int target = 25;
         
         switch (algorithm.toLowerCase()) {
             case "bubble-sort":
@@ -122,6 +167,14 @@ public class AlgorithmController {
                 return SortingAlgorithms.quickSort(demoArray);
             case "merge-sort":
                 return SortingAlgorithms.mergeSort(demoArray);
+            case "linear-search":
+                return SearchingAlgorithms.linearSearch(demoArray, target);
+            case "binary-search":
+                return SearchingAlgorithms.binarySearch(sortedArray, target);
+            case "jump-search":
+                return SearchingAlgorithms.jumpSearch(sortedArray, target);
+            case "interpolation-search":
+                return SearchingAlgorithms.interpolationSearch(sortedArray, target);
             default:
                 throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
         }

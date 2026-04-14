@@ -24,6 +24,11 @@ public class WebController {
         return "sorting";
     }
     
+    @GetMapping("/searching")
+    public String searching() {
+        return "searching";
+    }
+    
     @GetMapping("/guide")
     public String guide() {
         return "algorithm-guide";
@@ -34,10 +39,7 @@ public class WebController {
         return "datastructures";
     }
     
-    @GetMapping("/analytics")
-    public String analytics() {
-        return "analytics";
-    }
+
     
     @GetMapping("/array")
     public String array() {
@@ -77,6 +79,21 @@ public class WebController {
     @GetMapping("/queue-linkedlist")
     public String queueLinkedList() {
         return "queue-linkedlist";
+    }
+    
+    @GetMapping("/binary-tree")
+    public String binaryTree() {
+        return "binary-tree";
+    }
+    
+    @GetMapping("/performance")
+    public String performance() {
+        return "performance";
+    }
+    
+    @GetMapping("/graph")
+    public String graph() {
+        return "graph";
     }
     
     @GetMapping("/login")

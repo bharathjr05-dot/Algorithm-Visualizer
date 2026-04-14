@@ -38,78 +38,123 @@ function renderArray(array, highlightIndex = -1, operation = '') {
     });
 }
 
-async function performInsert() {
-    const element = parseInt(document.getElementById('insertElement').value);
-    const position = parseInt(document.getElementById('insertPosition').value);
+function performAccess() {
+    const index = parseInt(document.getElementById('accessIndex').value);
     
-    try {
-        const response = await fetch('/api/datastructures/array/insert', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                array: currentArray,
-                element: element,
-                position: position
-            })
+    currentSteps = [];
+    
+    if (index < 0 || index >= currentArray.length) {
+        currentSteps.push({
+            description: `❌ Index ${index} is out of bounds! Array size is ${currentArray.length} (valid indices: 0-${currentArray.length-1})`,
+            currentState: JSON.stringify(currentArray),
+            highlightedElements: '',
+            operation: 'ACCESS'
+        });
+    } else {
+        currentSteps.push({
+            description: `📍 Accessing array at index ${index}...`,
+            currentState: JSON.stringify(currentArray),
+            highlightedElements: '',
+            operation: 'ACCESS'
         });
         
-        currentSteps = await response.json();
-        currentStep = 0;
-        enablePlayback();
-        showCurrentStep();
-        
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('stepDescription').textContent = 'Error performing insert operation';
+        currentSteps.push({
+            description: `✅ Array[${index}] = ${currentArray[index]}. Direct access in O(1) time!`,
+            currentState: JSON.stringify(currentArray),
+            highlightedElements: index.toString(),
+            operation: 'ACCESS'
+        });
     }
+    
+    currentStep = 0;
+    enablePlayback();
+    showCurrentStep();
 }
 
-async function performDelete() {
-    const position = parseInt(document.getElementById('deletePosition').value);
+function performUpdate() {
+    const index = parseInt(document.getElementById('updateIndex').value);
+    const newValue = parseInt(document.getElementById('updateValue').value);
     
-    try {
-        const response = await fetch('/api/datastructures/array/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                array: currentArray,
-                position: position
-            })
+    currentSteps = [];
+    
+    if (index < 0 || index >= currentArray.length) {
+        currentSteps.push({
+            description: `❌ Index ${index} is out of bounds! Array size is ${currentArray.length} (valid indices: 0-${currentArray.length-1})`,
+            currentState: JSON.stringify(currentArray),
+            highlightedElements: '',
+            operation: 'UPDATE'
+        });
+    } else {
+        const oldValue = currentArray[index];
+        
+        currentSteps.push({
+            description: `📝 Updating array at index ${index} from ${oldValue} to ${newValue}...`,
+            currentState: JSON.stringify(currentArray),
+            highlightedElements: index.toString(),
+            operation: 'UPDATE'
         });
         
-        currentSteps = await response.json();
-        currentStep = 0;
-        enablePlayback();
-        showCurrentStep();
+        currentArray[index] = newValue;
+        document.getElementById('arrayInput').value = currentArray.join(',');
         
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('stepDescription').textContent = 'Error performing delete operation';
+        currentSteps.push({
+            description: `✅ Array[${index}] updated successfully! New value: ${newValue}. Update completed in O(1) time!`,
+            currentState: JSON.stringify(currentArray),
+            highlightedElements: index.toString(),
+            operation: 'UPDATE'
+        });
     }
+    
+    currentStep = 0;
+    enablePlayback();
+    showCurrentStep();
 }
 
-async function performSearch() {
+function performSearch() {
     const element = parseInt(document.getElementById('searchElement').value);
     
-    try {
-        const response = await fetch('/api/datastructures/array/search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                array: currentArray,
-                element: element
-            })
-        });
-        
-        currentSteps = await response.json();
-        currentStep = 0;
-        enablePlayback();
-        showCurrentStep();
-        
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('stepDescription').textContent = 'Error performing search operation';
+    currentSteps = [];
+    let found = false;
+    
+    currentSteps.push({
+        description: `🔍 Starting linear search for element ${element} in array [${currentArray.join(', ')}]`,
+        currentState: JSON.stringify(currentArray),
+        highlightedElements: '',
+        operation: 'SEARCH'
+    });
+    
+    for (let i = 0; i < currentArray.length; i++) {
+        if (currentArray[i] === element) {
+            currentSteps.push({
+                description: `✅ Found element ${element} at index ${i}! Search completed.`,
+                currentState: JSON.stringify(currentArray),
+                highlightedElements: i.toString(),
+                operation: 'SEARCH'
+            });
+            found = true;
+            break;
+        } else {
+            currentSteps.push({
+                description: `Checking index ${i}: ${currentArray[i]} ≠ ${element}, continue searching...`,
+                currentState: JSON.stringify(currentArray),
+                highlightedElements: i.toString(),
+                operation: 'SEARCH'
+            });
+        }
     }
+    
+    if (!found) {
+        currentSteps.push({
+            description: `❌ Element ${element} not found in the array. Search completed.`,
+            currentState: JSON.stringify(currentArray),
+            highlightedElements: '',
+            operation: 'SEARCH'
+        });
+    }
+    
+    currentStep = 0;
+    enablePlayback();
+    showCurrentStep();
 }
 
 function showCurrentStep() {
@@ -135,8 +180,8 @@ function showCurrentStep() {
     
     // Determine operation type for styling
     let operation = '';
-    if (step.operation === 'INSERT') operation = 'inserting';
-    else if (step.operation === 'DELETE') operation = 'deleting';
+    if (step.operation === 'ACCESS') operation = 'accessing';
+    else if (step.operation === 'UPDATE') operation = 'updating';
     else if (step.operation === 'SEARCH') operation = 'searching';
     
     // Render array with highlighting

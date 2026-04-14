@@ -16,8 +16,14 @@ public class AlgorithmStep {
     
     private String algorithmName;
     private int stepNumber;
+    
+    @Column(columnDefinition = "TEXT")
     private String description;
+    
+    @Column(columnDefinition = "TEXT")
     private String arrayState;
+    
+    @Column(columnDefinition = "TEXT")
     private String highlightedIndices;
     
     @Column(name = "comparison_count")

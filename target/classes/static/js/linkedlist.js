@@ -175,6 +175,12 @@ function showCurrentStep() {
         }
     }
     
+    // Update currentLinkedList with the final state when reaching the last step
+    if (currentStep === currentSteps.length - 1) {
+        currentLinkedList = [...listData];
+        document.getElementById('linkedlistInput').value = currentLinkedList.join(',');
+    }
+    
     const highlightedElements = step.highlightedElements ? 
         step.highlightedElements.split(',').map(i => parseInt(i.trim())).filter(i => !isNaN(i)) : [];
     

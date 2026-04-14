@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Searching Algorithms - Algorithm Visualizer</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .algorithm-selector {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .algorithm-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .algorithm-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .algorithm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .algorithm-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .input-group label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .input-group input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .visualization-area {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .array-container {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 5px;
+            margin: 20px 0;
+            min-height: 200px;
+        }
+        
+        .array-element {
+            background: #e9ecef;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .array-element.current {
+            background: #ffc107;
+            border-color: #ffb300;
+            transform: scale(1.1);
+        }
+        
+        .array-element.found {
+            background: #28a745;
+            border-color: #1e7e34;
+            color: white;
+        }
+        
+        .array-element.range {
+            background: #17a2b8;
+            border-color: #138496;
+            color: white;
+        }
+        
+        .step-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .step-counter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .algorithm-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+        }
+        
+        .complexity-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .complexity-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .target-display {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .array-container {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .array-element {
+                min-width: 40px;
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a th:href="@{/}">Algorithm Visualizer</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a th:href="@{/}" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/sorting}" class="nav-link">Sorting</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/searching}" class="nav-link active">Searching</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/datastructures}" class="nav-link">Data Structures</a>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="search-container">
+        <h1>Searching Algorithms Visualizer</h1>
+        
+        <div class="algorithm-selector">
+            <h3>Select Searching Algorithm</h3>
+            <div class="algorithm-buttons">
+                <button class="algorithm-btn active" data-algorithm="linear-search">Linear Search</button>
+                <button class="algorithm-btn" data-algorithm="binary-search">Binary Search</button>
+                <button class="algorithm-btn" data-algorithm="jump-search">Jump Search</button>
+                <button class="algorithm-btn" data-algorithm="interpolation-search">Interpolation Search</button>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="arrayInput">Array (comma-separated):</label>
+                <input type="text" id="arrayInput" placeholder="e.g., 64,34,25,12,22,11,90" value="11,12,22,25,34,64,90">
+                
+                <label for="targetInput">Target Value:</label>
+                <input type="number" id="targetInput" placeholder="e.g., 25" value="25">
+                
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="startSearch()">Start Search</button>
+                    <button class="btn btn-secondary" onclick="generateRandomArray()">Random Array</button>
+                    <button class="btn btn-success" onclick="sortArray()">Sort Array</button>
+                    <button class="btn btn-secondary" onclick="resetVisualization()">Reset</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="algorithm-info" id="algorithmInfo">
+            <h4 id="algorithmTitle">Linear Search</h4>
+            <p id="algorithmDescription">Linear search checks each element sequentially until the target is found or the end is reached.</p>
+            <div class="complexity-info">
+                <div class="complexity-item">
+                    <strong>Time Complexity</strong><br>
+                    <span id="timeComplexity">O(n)</span>
+                </div>
+                <div class="complexity-item">
+                    <strong>Space Complexity</strong><br>
+                    <span id="spaceComplexity">O(1)</span>
+                </div>
+                <div class="complexity-item">
+                    <strong>Best Case</strong><br>
+                    <span id="bestCase">O(1)</span>
+                </div>
+                <div class="complexity-item">
+                    <strong>Worst Case</strong><br>
+                    <span id="worstCase">O(n)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="visualization-area">
+            <div class="target-display" id="targetDisplay">Target: 25</div>
+            <div class="array-container" id="arrayContainer">
+                <!-- Array elements will be generated here -->
+            </div>
+            <div class="step-info" id="stepInfo">
+                <div class="step-counter">
+                    <span>Step: <span id="currentStep">0</span> / <span id="totalSteps">0</span></span>
+                    <div>
+                        <button class="btn btn-secondary" onclick="previousStep()" id="prevBtn" disabled>Previous</button>
+                        <button class="btn btn-primary" onclick="nextStep()" id="nextBtn" disabled>Next</button>
+                        <button class="btn btn-success" onclick="autoPlay()" id="playBtn" disabled>Auto Play</button>
+                    </div>
+                </div>
+                <div id="stepDescription">Click "Start Search" to begin visualization</div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/searching.js}"></script>
+</body>
+</html>

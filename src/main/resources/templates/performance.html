@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Performance Comparison</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1>Algorithm Visualizer</h1>
+            <ul class="nav-menu">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/sorting}">Sorting</a></li>
+                <li><a th:href="@{/datastructures}">Data Structures</a></li>
+                <li><a th:href="@{/performance}" class="active">Performance</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Algorithm Performance Comparison</h2>
+        
+        <div class="controls">
+            <label for="arraySize">Array Size:</label>
+            <select id="arraySize">
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100" selected>100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+            </select>
+            
+            <label for="dataType">Data Type:</label>
+            <select id="dataType">
+                <option value="random">Random</option>
+                <option value="sorted">Already Sorted</option>
+                <option value="reverse">Reverse Sorted</option>
+            </select>
+            
+            <button id="runComparison">Run Comparison</button>
+        </div>
+
+        <div class="results">
+            <canvas id="performanceChart" width="400" height="200"></canvas>
+            <div id="performanceTable"></div>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+        
+        document.getElementById('runComparison').addEventListener('click', async () => {
+            const size = parseInt(document.getElementById('arraySize').value);
+            const type = document.getElementById('dataType').value;
+            
+            const data = generateData(size, type);
+            
+            try {
+                const response = await fetch('/api/performance/compare-sorting', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: data })
+                });
+                
+                const results = await response.json();
+                displayResults(results);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+        
+        function generateData(size, type) {
+            let data = [];
+            for (let i = 0; i < size; i++) {
+                data.push(Math.floor(Math.random() * 1000));
+            }
+            
+            if (type === 'sorted') {
+                data.sort((a, b) => a - b);
+            } else if (type === 'reverse') {
+                data.sort((a, b) => b - a);
+            }
+            
+            return data;
+        }
+        
+        function displayResults(results) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Bubble Sort', 'Selection Sort', 'Insertion Sort'],
+                    datasets: [{
+                        label: 'Execution Time (ms)',
+                        data: [results.bubbleSort, results.selectionSort, results.insertionSort],
+                        backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Time (milliseconds)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Display table
+            const tableHtml = `
+                <table>
+                    <tr><th>Algorithm</th><th>Time (ms)</th></tr>
+                    <tr><td>Bubble Sort</td><td>${results.bubbleSort.toFixed(3)}</td></tr>
+                    <tr><td>Selection Sort</td><td>${results.selectionSort.toFixed(3)}</td></tr>
+                    <tr><td>Insertion Sort</td><td>${results.insertionSort.toFixed(3)}</td></tr>
+                </table>
+            `;
+            document.getElementById('performanceTable').innerHTML = tableHtml;
+        }
+    </script>
+</body>
+</html>

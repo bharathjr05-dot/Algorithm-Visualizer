@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Visualization - Algorithm Visualizer</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .graph-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 1rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            min-height: 500px;
+            max-height: 700px;
+            overflow: auto;
+            position: relative;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .input-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-info { background: #4ecdc4; color: white; }
+        .btn-warning { background: #feca57; color: white; }
+        .btn-danger { background: #ff6b6b; color: white; }
+        .status {
+            background: rgba(255,255,255,0.95);
+            padding: 8px 16px;
+            border-radius: 15px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .algorithm-info {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .algorithm-info h4 {
+            color: #667eea;
+            margin: 0 0 10px 0;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Graph Visualization</h1>
+        <a href="/datastructures" class="back-btn">← Back to Data Structures</a>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="number" id="nodeFrom" placeholder="From" min="0" max="9" style="width: 60px;">
+                <input type="number" id="nodeTo" placeholder="To" min="0" max="9" style="width: 60px;">
+                <input type="number" id="weight" placeholder="Weight" min="1" max="99" style="width: 70px;">
+                <button onclick="addEdge()" class="btn btn-primary">Add Edge</button>
+            </div>
+            <div class="input-group">
+                <input type="number" id="startNode" placeholder="Start Node" min="0" max="9" style="width: 80px;">
+                <button onclick="runDFS()" class="btn btn-info">DFS (Frontend)</button>
+                <button onclick="runBFS()" class="btn btn-info">BFS (Frontend)</button>
+                <button onclick="runDijkstra()" class="btn btn-warning">Dijkstra (Frontend)</button>
+            </div>
+            <div class="input-group">
+                <button onclick="runDFSBackend()" class="btn btn-info">DFS (Backend)</button>
+                <button onclick="runBFSBackend()" class="btn btn-info">BFS (Backend)</button>
+                <button onclick="runDijkstraBackend()" class="btn btn-warning">Dijkstra (Backend)</button>
+            </div>
+            <button onclick="clearGraph()" class="btn btn-danger">Clear</button>
+        </div>
+
+        <div class="status" id="status">Ready - Add edges to build your graph</div>
+        
+        <div class="algorithm-info" id="algorithmInfo">
+            <h4>🔄 Current Operation: Ready</h4>
+            <div id="algorithmSteps">
+                <div class="step">💡 Add edges using the controls above</div>
+                <div class="step">🔍 Run DFS, BFS, or Dijkstra algorithms</div>
+                <div class="step">📊 Watch the step-by-step visualization</div>
+            </div>
+        </div>
+
+        <div class="graph-container" id="graphContainer">
+            <!-- Graph will be rendered here -->
+        </div>
+    </div>
+
+    <script>
+        class Graph {
+            constructor() {
+                this.nodes = new Set();
+                this.edges = new Map();
+                this.nodePositions = {};
+                this.isAnimating = false;
+            }
+            
+            addEdge(from, to, weight = 1) {
+                this.nodes.add(from);
+                this.nodes.add(to);
+                
+                if (!this.edges.has(from)) {
+                    this.edges.set(from, []);
+                }
+                this.edges.get(from).push({to: to, weight: weight});
+                
+                this.calculatePositions();
+                this.render();
+            }
+            
+            calculatePositions() {
+                const nodeCount = this.nodes.size;
+                const centerX = 400;
+                const centerY = 250;
+                const radius = 180;
+                
+                let index = 0;
+                for (let node of this.nodes) {
+                    const angle = (2 * Math.PI * index) / nodeCount;
+                    this.nodePositions[node] = {
+                        x: centerX + radius * Math.cos(angle),
+                        y: centerY + radius * Math.sin(angle)
+                    };
+                    index++;
+                }
+            }
+            
+            render() {
+                const container = document.getElementById('graphContainer');
+                const width = Math.max(800, Object.keys(this.nodePositions).length * 100);
+                const height = 500;
+                
+                let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="background: #f8f9fa; border-radius: 10px;">`;
+                
+                svg += `<defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+                    </marker>
+                </defs>`;
+                
+                // Draw edges
+                for (let [from, connections] of this.edges) {
+                    const fromPos = this.nodePositions[from];
+                    for (let connection of connections) {
+                        const toPos = this.nodePositions[connection.to];
+                        const midX = (fromPos.x + toPos.x) / 2;
+                        const midY = (fromPos.y + toPos.y) / 2;
+                        
+                        svg += `<line x1="${fromPos.x}" y1="${fromPos.y}" x2="${toPos.x}" y2="${toPos.y}" 
+                                stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" 
+                                data-edge="${from}-${connection.to}" />`;
+                        
+                        svg += `<circle cx="${midX}" cy="${midY}" r="12" fill="white" stroke="#666" stroke-width="1"/>`;
+                        svg += `<text x="${midX}" y="${midY}" text-anchor="middle" dominant-baseline="central" 
+                                font-size="10" font-weight="bold">${connection.weight}</text>`;
+                    }
+                }
+                
+                // Draw nodes
+                for (let node of this.nodes) {
+                    const pos = this.nodePositions[node];
+                    svg += `<circle cx="${pos.x}" cy="${pos.y}" r="25" fill="#667eea" stroke="#fff" 
+                            stroke-width="3" data-node="${node}" />`;
+                    svg += `<text x="${pos.x}" y="${pos.y}" text-anchor="middle" dominant-baseline="central" 
+                            fill="white" font-size="14" font-weight="bold">${node}</text>`;
+                }
+                
+                svg += '</svg>';
+                container.innerHTML = svg;
+            }
+            
+            highlightNode(node, color = '#feca57') {
+                const nodeElement = document.querySelector(`circle[data-node="${node}"]`);
+                if (nodeElement) {
+                    nodeElement.setAttribute('fill', color);
+                    nodeElement.style.transform = 'scale(1.2)';
+                    nodeElement.style.transformOrigin = 'center';
+                }
+            }
+            
+            highlightEdge(from, to, color = '#ff6b6b') {
+                const edgeElement = document.querySelector(`line[data-edge="${from}-${to}"]`);
+                if (edgeElement) {
+                    edgeElement.setAttribute('stroke', color);
+                    edgeElement.setAttribute('stroke-width', '4');
+                }
+            }
+            
+            clearHighlights() {
+                document.querySelectorAll('circle[data-node]').forEach(node => {
+                    node.setAttribute('fill', '#667eea');
+                    node.style.transform = 'scale(1)';
+                });
+                document.querySelectorAll('line[data-edge]').forEach(edge => {
+                    edge.setAttribute('stroke', '#666');
+                    edge.setAttribute('stroke-width', '2');
+                });
+            }
+            
+            async dfs(start) {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+                
+                if (!this.nodes.has(start)) {
+                    updateStatus('Start node ' + start + ' does not exist in graph');
+                    this.isAnimating = false;
+                    return;
+                }
+                
+                this.clearHighlights();
+                const visited = new Set();
+                const stack = [start];
+                const result = [];
+                
+                updateStatus('Starting DFS traversal from node ' + start);
+                updateAlgorithmInfo('Depth-First Search (DFS)', [
+                    '🎯 Starting from node ' + start,
+                    '📚 Using stack-based approach',
+                    '🔍 Explores as far as possible before backtracking'
+                ]);
+                
+                while (stack.length > 0) {
+                    const node = stack.pop();
+                    
+                    if (!visited.has(node)) {
+                        visited.add(node);
+                        result.push(node);
+                        
+                        this.highlightNode(node, '#00b894');
+                        updateStatus('Visiting node ' + node + ' | Stack: [' + stack.join(', ') + ']');
+                        updateAlgorithmInfo('DFS - Processing Node ' + node, [
+                            '📤 Pop node ' + node + ' from stack',
+                            '✅ Mark as visited',
+                            '📝 Path: ' + result.join(' → '),
+                            '📚 Stack: [' + stack.join(', ') + ']'
+                        ]);
+                        
+                        await sleep(1500);
+                        
+                        // Add neighbors to stack in reverse order for correct traversal
+                        if (this.edges.has(node)) {
+                            const neighbors = this.edges.get(node).slice().reverse();
+                            for (let connection of neighbors) {
+                                if (!visited.has(connection.to)) {
+                                    stack.push(connection.to);
+                                    this.highlightEdge(node, connection.to, '#00b894');
+                                    updateAlgorithmInfo('DFS - Adding to Stack', [
+                                        '➡️ Found unvisited neighbor: ' + connection.to,
+                                        '📥 Push to stack',
+                                        '📚 Stack: [' + stack.join(', ') + ']'
+                                    ]);
+                                    await sleep(800);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                updateStatus('DFS completed: ' + result.join(' → '));
+                this.isAnimating = false;
+            }
+            
+            async bfs(start) {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+                
+                if (!this.nodes.has(start)) {
+                    updateStatus('Start node ' + start + ' does not exist in graph');
+                    this.isAnimating = false;
+                    return;
+                }
+                
+                this.clearHighlights();
+                const visited = new Set();
+                const queue = [start];
+                const result = [];
+                
+                visited.add(start);
+                
+                updateStatus('Starting BFS traversal from node ' + start);
+                updateAlgorithmInfo('Breadth-First Search (BFS)', [
+                    '🎯 Starting from node ' + start,
+                    '📋 Using queue (FIFO) approach',
+                    '🌊 Explores level by level'
+                ]);
+                
+                while (queue.length > 0) {
+                    const node = queue.shift();
+                    result.push(node);
+                    
+                    this.highlightNode(node, '#4ecdc4');
+                    updateStatus('Processing node ' + node + ' | Queue: [' + queue.join(', ') + ']');
+                    updateAlgorithmInfo('BFS - Processing Node ' + node, [
+                        '📤 Dequeue node ' + node + ' (FIFO)',
+                        '✅ Mark as visited',
+                        '📝 Path: ' + result.join(' → '),
+                        '📋 Queue: [' + queue.join(', ') + ']'
+                    ]);
+                    
+                    await sleep(1500);
+                    
+                    if (this.edges.has(node)) {
+                        for (let connection of this.edges.get(node)) {
+                            if (!visited.has(connection.to)) {
+                                visited.add(connection.to);
+                                queue.push(connection.to);
+                                
+                                this.highlightEdge(node, connection.to, '#4ecdc4');
+                                updateAlgorithmInfo('BFS - Adding Neighbor', [
+                                    '➡️ Found unvisited neighbor: ' + connection.to,
+                                    '📥 Enqueue to rear of queue',
+                                    '📋 Queue: [' + queue.join(', ') + ']'
+                                ]);
+                                await sleep(800);
+                            }
+                        }
+                    }
+                }
+                
+                updateStatus('BFS completed: ' + result.join(' → '));
+                this.isAnimating = false;
+            }
+            
+            async dijkstra(start) {
+                if (this.isAnimating) return;
+                this.isAnimating = true;
+                
+                if (!this.nodes.has(start)) {
+                    updateStatus('Start node ' + start + ' does not exist in graph');
+                    this.isAnimating = false;
+                    return;
+                }
+                
+                this.clearHighlights();
+                const distances = {};
+                const visited = new Set();
+                const previous = {};
+                const priorityQueue = [];
+                
+                // Initialize distances
+                for (let node of this.nodes) {
+                    distances[node] = node === start ? 0 : Infinity;
+                    if (node === start) {
+                        priorityQueue.push({node: node, distance: 0});
+                    }
+                }
+                
+                updateStatus('Starting Dijkstra algorithm from node ' + start);
+                updateAlgorithmInfo('Dijkstra\'s Shortest Path', [
+                    '🎯 Starting from node ' + start,
+                    '📏 Finding shortest paths using priority queue',
+                    '⚡ Initial distance to ' + start + ': 0'
+                ]);
+                
+                while (priorityQueue.length > 0) {
+                    // Sort by distance and get minimum
+                    priorityQueue.sort((a, b) => a.distance - b.distance);
+                    const current = priorityQueue.shift();
+                    
+                    if (visited.has(current.node)) continue;
+                    
+                    visited.add(current.node);
+                    this.highlightNode(current.node, '#ff9ff3');
+                    
+                    updateStatus('Processing node ' + current.node + ' (distance: ' + current.distance + ')');
+                    updateAlgorithmInfo('Dijkstra - Processing Node ' + current.node, [
+                        '🎯 Selected node: ' + current.node + ' (distance: ' + current.distance + ')',
+                        '✅ Mark as permanently visited',
+                        '🔍 Relaxing edges to neighbors...'
+                    ]);
+                    
+                    await sleep(1500);
+                    
+                    // Relax edges to neighbors
+                    if (this.edges.has(current.node)) {
+                        for (let connection of this.edges.get(current.node)) {
+                            const neighbor = connection.to;
+                            const newDistance = distances[current.node] + connection.weight;
+                            
+                            this.highlightEdge(current.node, neighbor, '#feca57');
+                            
+                            if (newDistance < distances[neighbor]) {
+                                const oldDistance = distances[neighbor];
+                                distances[neighbor] = newDistance;
+                                previous[neighbor] = current.node;
+                                
+                                // Add to priority queue if not visited
+                                if (!visited.has(neighbor)) {
+                                    priorityQueue.push({node: neighbor, distance: newDistance});
+                                }
+                                
+                                updateAlgorithmInfo('Dijkstra - Edge Relaxation', [
+                                    '📏 Edge ' + current.node + ' → ' + neighbor + ' (weight: ' + connection.weight + ')',
+                                    '🔄 Old distance: ' + (oldDistance === Infinity ? '∞' : oldDistance),
+                                    '✨ New distance: ' + newDistance + ' (Improved!)'
+                                ]);
+                            } else {
+                                updateAlgorithmInfo('Dijkstra - No Improvement', [
+                                    '📏 Edge ' + current.node + ' → ' + neighbor + ' (weight: ' + connection.weight + ')',
+                                    '❌ New distance ' + newDistance + ' ≥ current ' + distances[neighbor],
+                                    '⏭️ No update needed'
+                                ]);
+                            }
+                            
+                            await sleep(1000);
+                        }
+                    }
+                }
+                
+                // Show final distances
+                let resultText = 'Shortest distances from ' + start + ': ';
+                const sortedNodes = Array.from(this.nodes).sort();
+                for (let node of sortedNodes) {
+                    if (node !== start) {
+                        const dist = distances[node] === Infinity ? '∞' : distances[node];
+                        resultText += node + '(' + dist + ') ';
+                    }
+                }
+                
+                updateStatus('Dijkstra completed: ' + resultText);
+                this.isAnimating = false;
+            }
+        }
+        
+        const graph = new Graph();
+        
+        function addEdge() {
+            const from = parseInt(document.getElementById('nodeFrom').value);
+            const to = parseInt(document.getElementById('nodeTo').value);
+            const weight = parseInt(document.getElementById('weight').value) || 1;
+            
+            if (isNaN(from) || isNaN(to)) {
+                updateStatus('Please enter valid node numbers');
+                return;
+            }
+            
+            if (from === to) {
+                updateStatus('Self-loops not allowed');
+                return;
+            }
+            
+            graph.addEdge(from, to, weight);
+            updateStatus('Added edge: ' + from + ' → ' + to + ' (weight: ' + weight + ')');
+            updateAlgorithmInfo('Graph Updated', [
+                '📊 Nodes: ' + Array.from(graph.nodes).sort().join(', '),
+                '🔗 Total edges: ' + Array.from(graph.edges.values()).reduce((sum, arr) => sum + arr.length, 0),
+                '🎯 Ready for algorithms'
+            ]);
+            
+            // Clear inputs
+            document.getElementById('nodeFrom').value = '';
+            document.getElementById('nodeTo').value = '';
+            document.getElementById('weight').value = '';
+        }
+        
+        function runDFS() {
+            const start = parseInt(document.getElementById('startNode').value);
+            if (isNaN(start)) {
+                updateStatus('Please enter a valid start node number');
+                return;
+            }
+            if (graph.nodes.size === 0) {
+                updateStatus('Graph is empty. Add some edges first.');
+                return;
+            }
+            if (!graph.nodes.has(start)) {
+                updateStatus('Node ' + start + ' does not exist. Available nodes: ' + Array.from(graph.nodes).join(', '));
+                return;
+            }
+            
+            graph.clearHighlights();
+            graph.dfs(start);
+        }
+        
+        function runBFS() {
+            const start = parseInt(document.getElementById('startNode').value);
+            if (isNaN(start)) {
+                updateStatus('Please enter a valid start node number');
+                return;
+            }
+            if (graph.nodes.size === 0) {
+                updateStatus('Graph is empty. Add some edges first.');
+                return;
+            }
+            if (!graph.nodes.has(start)) {
+                updateStatus('Node ' + start + ' does not exist. Available nodes: ' + Array.from(graph.nodes).join(', '));
+                return;
+            }
+            
+            graph.clearHighlights();
+            graph.bfs(start);
+        }
+        
+        function runDijkstra() {
+            const start = parseInt(document.getElementById('startNode').value);
+            if (isNaN(start)) {
+                updateStatus('Please enter a valid start node number');
+                return;
+            }
+            if (graph.nodes.size === 0) {
+                updateStatus('Graph is empty. Add some edges first.');
+                return;
+            }
+            if (!graph.nodes.has(start)) {
+                updateStatus('Node ' + start + ' does not exist. Available nodes: ' + Array.from(graph.nodes).join(', '));
+                return;
+            }
+            
+            graph.clearHighlights();
+            graph.dijkstra(start);
+        }
+        
+        function clearGraph() {
+            if (graph.isAnimating) {
+                updateStatus('Cannot clear graph while algorithm is running');
+                return;
+            }
+            
+            graph.nodes.clear();
+            graph.edges.clear();
+            graph.nodePositions = {};
+            document.getElementById('graphContainer').innerHTML = '<div style="text-align: center; padding: 100px; color: #666; font-size: 18px;">📊 Graph is empty<br><br>Add edges using the controls above to get started</div>';
+            updateStatus('Graph cleared - Add edges to build a new graph');
+            updateAlgorithmInfo('Graph Cleared', [
+                '🗑️ All nodes and edges removed',
+                '➕ Add edges to create a new graph',
+                '🎯 Then run algorithms to visualize'
+            ]);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        function updateAlgorithmInfo(title, steps) {
+            const infoElement = document.getElementById('algorithmInfo');
+            let html = '<h4>🔄 ' + title + '</h4><div id="algorithmSteps">';
+            steps.forEach(step => {
+                html += '<div class="step">' + step + '</div>';
+            });
+            html += '</div>';
+            infoElement.innerHTML = html;
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Initialize with sample graph
+        setTimeout(() => {
+            // Clear any existing graph first
+            graph.nodes.clear();
+            graph.edges.clear();
+            graph.nodePositions = {};
+            
+            // Add sample edges
+            graph.addEdge(0, 1, 4);
+            graph.addEdge(0, 2, 2);
+            graph.addEdge(1, 2, 1);
+            graph.addEdge(1, 3, 5);
+            graph.addEdge(2, 3, 8);
+            graph.addEdge(2, 4, 10);
+            graph.addEdge(3, 4, 2);
+            
+            updateStatus('Sample graph loaded with nodes: ' + Array.from(graph.nodes).sort().join(', '));
+            updateAlgorithmInfo('Sample Graph Loaded', [
+                '📊 Graph with ' + graph.nodes.size + ' nodes and 7 edges',
+                '🎯 Available nodes: ' + Array.from(graph.nodes).sort().join(', '),
+                '🔍 Enter a start node and run DFS, BFS, or Dijkstra'
+            ]);
+        }, 500);
+        
+        // Backend algorithm functions
+        function runDFSBackend() {
+            const start = parseInt(document.getElementById('startNode').value);
+            if (isNaN(start)) {
+                updateStatus('Please enter a valid start node number');
+                return;
+            }
+            if (graph.nodes.size === 0) {
+                updateStatus('Graph is empty. Add some edges first.');
+                return;
+            }
+            if (!graph.nodes.has(start)) {
+                updateStatus('Node ' + start + ' does not exist. Available nodes: ' + Array.from(graph.nodes).join(', '));
+                return;
+            }
+            
+            graph.clearHighlights();
+            updateStatus('Backend DFS not implemented yet. Using frontend version.');
+            graph.dfs(start);
+        }
+        
+        function runBFSBackend() {
+            const start = parseInt(document.getElementById('startNode').value);
+            if (isNaN(start)) {
+                updateStatus('Please enter a valid start node number');
+                return;
+            }
+            if (graph.nodes.size === 0) {
+                updateStatus('Graph is empty. Add some edges first.');
+                return;
+            }
+            if (!graph.nodes.has(start)) {
+                updateStatus('Node ' + start + ' does not exist. Available nodes: ' + Array.from(graph.nodes).join(', '));
+                return;
+            }
+            
+            graph.clearHighlights();
+            updateStatus('Backend BFS not implemented yet. Using frontend version.');
+            graph.bfs(start);
+        }
+        
+        function runDijkstraBackend() {
+            const start = parseInt(document.getElementById('startNode').value);
+            if (isNaN(start)) {
+                updateStatus('Please enter a valid start node number');
+                return;
+            }
+            if (graph.nodes.size === 0) {
+                updateStatus('Graph is empty. Add some edges first.');
+                return;
+            }
+            if (!graph.nodes.has(start)) {
+                updateStatus('Node ' + start + ' does not exist. Available nodes: ' + Array.from(graph.nodes).join(', '));
+                return;
+            }
+            
+            graph.clearHighlights();
+            updateStatus('Backend Dijkstra not implemented yet. Using frontend version.');
+            graph.dijkstra(start);
+        }
+    </script>
+    <script src="/js/graph-backend.js"></script>
+</body>
+</html>

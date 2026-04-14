@@ -25,22 +25,22 @@
             
             <div class="operation-buttons">
                 <div class="operation-group">
-                    <h4>Insert Operation</h4>
-                    <input type="number" id="insertElement" placeholder="Element" value="25">
-                    <input type="number" id="insertPosition" placeholder="Position" value="2">
-                    <button onclick="performInsert()">Insert</button>
-                </div>
-                
-                <div class="operation-group">
-                    <h4>Delete Operation</h4>
-                    <input type="number" id="deletePosition" placeholder="Position" value="1">
-                    <button onclick="performDelete()">Delete</button>
-                </div>
-                
-                <div class="operation-group">
-                    <h4>Search Operation</h4>
+                    <h4>🔍 Search Operation</h4>
                     <input type="number" id="searchElement" placeholder="Element" value="30">
                     <button onclick="performSearch()">Search</button>
+                </div>
+                
+                <div class="operation-group">
+                    <h4>📖 Access Operation</h4>
+                    <input type="number" id="accessIndex" placeholder="Index" value="2" min="0">
+                    <button onclick="performAccess()">Access</button>
+                </div>
+                
+                <div class="operation-group">
+                    <h4>✏️ Update Operation</h4>
+                    <input type="number" id="updateIndex" placeholder="Index" value="1" min="0">
+                    <input type="number" id="updateValue" placeholder="New Value" value="99">
+                    <button onclick="performUpdate()">Update</button>
                 </div>
             </div>
         </div>

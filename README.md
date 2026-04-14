@@ -1,86 +1,335 @@
-# Algorithm Visualizer
+# 🚀 Algorithm Visualizer
 
-An interactive web application that helps students learn Data Structures and Algorithms through step-by-step visual representations.
+A comprehensive web application for visualizing and learning algorithms interactively. Built with Spring Boot, MySQL, and modern web technologies.
 
-## Features
+## 📋 Table of Contents
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Installation & Setup](#installation--setup)
+- [Database Setup](#database-setup)
+- [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [API Endpoints](#api-endpoints)
+- [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
 
-- **Interactive Visualizations**: Watch algorithms execute step by step
-- **Multiple Sorting Algorithms**: Bubble Sort, Selection Sort (more coming soon)
-- **Playback Controls**: Play, pause, step forward/backward through algorithm execution
-- **Custom Input**: Enter your own arrays to visualize
-- **Detailed Explanations**: Each step includes clear descriptions of what's happening
+## ✨ Features
 
-## Technology Stack
+### 🔄 Sorting Algorithms
+- **Bubble Sort** - Step-by-step bubble comparison visualization
+- **Selection Sort** - Finding minimum elements with visual selection
+- **Insertion Sort** - Card-like insertion with shifting animation
+- **Merge Sort** - Divide and conquer with array splitting visualization
+- **Quick Sort** - Pivot-based partitioning with recursive calls
+- **Heap Sort** - Binary heap operations and sorting
 
-- **Backend**: Java Spring Boot
-- **Database**: MySQL
-- **Frontend**: HTML, CSS, JavaScript
-- **Build Tool**: Maven
+### 🔍 Searching Algorithms
+- **Linear Search** - Sequential element checking
+- **Binary Search** - Efficient sorted array searching
+- **Jump Search** - Block-based searching optimization
+- **Interpolation Search** - Value-based position estimation
 
-## Setup Instructions
+### 📊 Data Structures
+- **Arrays** - Search, Access, Update operations (Fixed-size)
+- **Linked Lists** - Dynamic insertion, deletion, traversal
+- **Stacks** - LIFO operations (Push, Pop, Peek)
+- **Queues** - FIFO operations (Enqueue, Dequeue)
+- **Binary Trees** - Insert, Delete, Traversals
+- **Graphs** - BFS, DFS algorithms
 
-### Prerequisites
-- Java 17 or higher
-- MySQL 8.0 or higher
-- Maven 3.6 or higher
+### 📈 Analytics Dashboard
+- **Learning Progress** - Track algorithm mastery
+- **Time Investment** - Monitor learning hours
+- **Achievement System** - Badges and milestones
+- **Skill Levels** - Visual progress indicators
 
-### Database Setup
-1. Install MySQL and start the service
-2. Run the SQL script: `mysql -u root -p < database_setup.sql`
-3. Update database credentials in `src/main/resources/application.properties`
+## 🛠 Tech Stack
 
-### Running the Application
-1. Clone the repository
-2. Navigate to project directory: `cd AlgorithmVisualizer`
-3. Run: `mvn spring-boot:run`
-4. Open browser and go to: `http://localhost:8080`
+### Backend
+- **Java 17+** - Programming language
+- **Spring Boot 3.x** - Application framework
+- **Spring Data JPA** - Database abstraction
+- **MySQL 8.0+** - Database
+- **Maven** - Dependency management
 
-## Usage
+### Frontend
+- **HTML5** - Structure
+- **CSS3** - Styling with modern features
+- **JavaScript (ES6+)** - Interactive functionality
+- **Thymeleaf** - Server-side templating
 
-1. **Home Page**: Choose from different algorithm categories
-2. **Sorting Page**: 
-   - Enter custom array or use default
-   - Select sorting algorithm
-   - Use playback controls to visualize step-by-step execution
-3. **Visual Elements**:
-   - Blue bars represent array elements
-   - Red bars indicate elements being compared/swapped
-   - Height represents the value of each element
+### Tools
+- **Git** - Version control
+- **IntelliJ IDEA / VS Code** - IDE
+- **MySQL Workbench** - Database management
 
-## Project Structure
+## 📋 Prerequisites
+
+Before setting up the project, ensure you have:
+
+1. **Java Development Kit (JDK) 17 or higher**
+   ```bash
+   java -version
+   ```
+
+2. **Apache Maven 3.6+**
+   ```bash
+   mvn -version
+   ```
+
+3. **MySQL Server 8.0+**
+   ```bash
+   mysql --version
+   ```
+
+4. **Git**
+   ```bash
+   git --version
+   ```
+
+## 🚀 Installation & Setup
+
+### 1. Clone the Repository
+```bash
+git clone <your-repository-url>
+cd AlgorithmVisualizer
+```
+
+### 2. Configure Database Connection
+Edit `src/main/resources/application.properties`:
+```properties
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/algorithm_visualizer
+spring.datasource.username=root
+spring.datasource.password=
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
+# Server Configuration
+server.port=8082
+```
+
+### 3. Install Dependencies
+```bash
+mvn clean install
+```
+
+## 🗄️ Database Setup
+
+### 1. Create Database
+```sql
+CREATE DATABASE algorithm_visualizer;
+USE algorithm_visualizer;
+```
+
+### 2. Run Database Setup Script
+Execute the provided SQL script:
+```bash
+mysql -u root -p algorithm_visualizer < database_setup_complete.sql
+```
+
+### 3. Verify Tables
+Check if tables are created:
+```sql
+SHOW TABLES;
+```
+
+Expected tables:
+- `algorithms`
+- `users`
+- `user_sessions`
+- `user_progress`
+
+## ▶️ Running the Application
+
+### Option 1: Using Maven
+```bash
+mvn spring-boot:run
+```
+
+### Option 2: Using Batch File (Windows)
+```bash
+run_application.bat
+```
+
+### Option 3: Using JAR
+```bash
+mvn clean package
+java -jar target/algorithm-visualizer-1.0.0.jar
+```
+
+### Access the Application
+Open your browser and navigate to:
+```
+http://localhost:8082
+```
+
+## 📁 Project Structure
 
 ```
 AlgorithmVisualizer/
-├── src/main/java/com/algorithmvisualizer/
-│   ├── AlgorithmVisualizerApplication.java
-│   ├── algorithm/
-│   │   └── SortingAlgorithms.java
-│   ├── controller/
-│   │   ├── AlgorithmController.java
-│   │   └── WebController.java
-│   └── model/
-│       └── AlgorithmStep.java
-├── src/main/resources/
-│   ├── static/
-│   │   ├── css/style.css
-│   │   └── js/sorting.js
-│   ├── templates/
-│   │   ├── index.html
-│   │   └── sorting.html
-│   └── application.properties
-├── database_setup.sql
-└── pom.xml
+├── src/
+│   ├── main/
+│   │   ├── java/com/algorithmvisualizer/
+│   │   │   ├── controller/          # REST Controllers
+│   │   │   │   ├── AlgorithmController.java
+│   │   │   │   └── WebController.java
+│   │   │   ├── model/               # Entity Classes
+│   │   │   │   ├── Algorithm.java
+│   │   │   │   ├── User.java
+│   │   │   │   ├── UserSession.java
+│   │   │   │   └── AlgorithmStep.java
+│   │   │   ├── repository/          # Data Access Layer
+│   │   │   │   ├── AlgorithmRepository.java
+│   │   │   │   ├── UserRepository.java
+│   │   │   │   └── UserSessionRepository.java
+│   │   │   ├── service/             # Business Logic
+│   │   │   │   ├── AlgorithmSessionService.java
+│   │   │   │   └── UserService.java
+│   │   │   ├── algorithm/           # Algorithm Implementations
+│   │   │   │   ├── SortingAlgorithms.java
+│   │   │   │   └── SearchingAlgorithms.java
+│   │   │   └── AlgorithmVisualizerApplication.java
+│   │   └── resources/
+│   │       ├── templates/           # HTML Templates
+│   │       │   ├── index.html
+│   │       │   ├── sorting.html
+│   │       │   ├── searching.html
+│   │       │   ├── datastructures.html
+│   │       │   ├── array.html
+│   │       │   └── analytics.html
+│   │       ├── static/
+│   │       │   ├── css/             # Stylesheets
+│   │       │   │   ├── style.css
+│   │       │   │   └── datastructures.css
+│   │       │   └── js/              # JavaScript Files
+│   │       │       ├── sorting.js
+│   │       │       ├── searching.js
+│   │       │       ├── datastructures.js
+│   │       │       └── array.js
+│   │       └── application.properties
+├── database_setup_complete.sql     # Database Schema
+├── run_application.bat             # Windows Startup Script
+├── pom.xml                        # Maven Configuration
+└── README.md                      # This file
 ```
 
-## Future Enhancements
+## 🔌 API Endpoints
 
-- Search algorithms (Binary Search, Linear Search)
-- Data structures (Stack, Queue, Tree, Graph)
-- User authentication and progress tracking
-- Algorithm complexity analysis
-- More sorting algorithms (Quick Sort, Merge Sort, Heap Sort)
-- Mobile responsive design
+### Sorting Algorithms
+- `POST /api/algorithms/bubble-sort` - Bubble sort visualization
+- `POST /api/algorithms/selection-sort` - Selection sort visualization
+- `POST /api/algorithms/insertion-sort` - Insertion sort visualization
+- `POST /api/algorithms/merge-sort` - Merge sort visualization
+- `POST /api/algorithms/quick-sort` - Quick sort visualization
+- `POST /api/algorithms/heap-sort` - Heap sort visualization
 
-## Contributing
+### Searching Algorithms
+- `POST /api/algorithms/linear-search` - Linear search visualization
+- `POST /api/algorithms/binary-search` - Binary search visualization
+- `POST /api/algorithms/jump-search` - Jump search visualization
+- `POST /api/algorithms/interpolation-search` - Interpolation search visualization
 
-Feel free to contribute by adding new algorithms, improving visualizations, or enhancing the user interface!
+### Analytics
+- `GET /api/analytics/top-performers` - Get top performing users
+- `GET /api/analytics/algorithm-stats` - Get algorithm statistics
+- `GET /api/algorithms/user/{userId}/sessions` - Get user sessions
+- `GET /api/algorithms/user/{userId}/progress` - Get user progress
+
+### Session Management
+- `POST /api/algorithms/start-session` - Start learning session
+- `POST /api/algorithms/complete-session` - Complete learning session
+
+## 🤝 Contributing
+
+### Development Workflow
+1. **Create a new branch** for your feature
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes** and test thoroughly
+
+3. **Commit your changes**
+   ```bash
+   git add .
+   git commit -m "Add: your feature description"
+   ```
+
+4. **Push to your branch**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+5. **Create a Pull Request**
+
+### Code Style Guidelines
+- Use **camelCase** for Java variables and methods
+- Use **PascalCase** for Java classes
+- Use **kebab-case** for CSS classes
+- Add **comments** for complex algorithms
+- Follow **Spring Boot** best practices
+
+### Adding New Algorithms
+1. **Implement algorithm** in appropriate class (`SortingAlgorithms.java` or `SearchingAlgorithms.java`)
+2. **Add REST endpoint** in `AlgorithmController.java`
+3. **Create frontend** visualization in corresponding JS file
+4. **Add navigation** in HTML templates
+5. **Update documentation**
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### 1. Database Connection Failed
+```
+Error: Could not connect to MySQL
+```
+**Solution:**
+- Ensure MySQL server is running
+- Check username/password in `application.properties`
+- Verify database exists
+
+#### 2. Port Already in Use
+```
+Error: Port 8082 is already in use
+```
+**Solution:**
+- Change port in `application.properties`
+- Kill process using the port
+- Use different port number
+
+#### 3. Maven Build Failed
+```
+Error: Failed to execute goal
+```
+**Solution:**
+- Check Java version (must be 17+)
+- Clear Maven cache: `mvn clean`
+- Update dependencies: `mvn clean install -U`
+
+#### 4. Frontend Not Loading
+```
+Error: 404 Not Found for static resources
+```
+**Solution:**
+- Check file paths in `static/` directory
+- Verify Thymeleaf syntax in templates
+- Clear browser cache
+
+### Getting Help
+- Check the **Issues** section in Git repository
+- Review **console logs** for error details
+- Verify **prerequisites** are installed correctly
+
+## 📞 Contact
+
+For questions or support, contact the development team or create an issue in the repository.
+
+---
+
+**Happy Coding! 🚀**
