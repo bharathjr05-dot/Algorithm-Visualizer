@@ -3,6 +3,7 @@
 A comprehensive web application for visualizing and learning algorithms interactively. Built with Spring Boot, MySQL, and modern web technologies.
 
 ## 📋 Table of Contents
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
@@ -13,6 +14,22 @@ A comprehensive web application for visualizing and learning algorithms interact
 - [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
+
+## 📸 Screenshots
+
+### 🏠 Home
+![Home](assets/Home.png)
+
+### 📊 Sorting Algorithms
+![Sorting](assets/Sorting.png)
+
+### 🔍 Searching Algorithms
+![Searching](assets/Searching.png)
+
+### 🗂️ Data Structures
+![Data Structures](assets/DataStructures.png)
+
+---
 
 ## ✨ Features
 
@@ -92,7 +109,7 @@ Before setting up the project, ensure you have:
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/bharathjr05-dot/Algorithm-Visualizer.git
 cd AlgorithmVisualizer
 ```
 
@@ -212,6 +229,11 @@ AlgorithmVisualizer/
 │   │       │       ├── datastructures.js
 │   │       │       └── array.js
 │   │       └── application.properties
+├── assets/                         # Screenshots
+│   ├── Home.png
+│   ├── Sorting.png
+│   ├── Searching.png
+│   └── DataStructures.png
 ├── database_setup_complete.sql     # Database Schema
 ├── run_application.bat             # Windows Startup Script
 ├── pom.xml                        # Maven Configuration
