@@ -357,9 +357,6 @@ Error: 404 Not Found for static resources
 - Review **console logs** for error details
 - Verify **prerequisites** are installed correctly
 
-## 📞 Contact
-
-For questions or support, contact the development team or create an issue in the repository.
 
 ---
 
