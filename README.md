@@ -356,8 +356,3 @@ Error: 404 Not Found for static resources
 - Check the **Issues** section in Git repository
 - Review **console logs** for error details
 - Verify **prerequisites** are installed correctly
-
-
----
-
-**Happy Coding! 🚀**
